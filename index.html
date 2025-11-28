@@ -4,20 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบค้นหา PO - คลังน้ำมัน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 90%; max-width: 500px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #0056b3; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        /* --- Minimalist Green Theme Variables --- */
+        :root {
+            --primary-green: #2e7d32; /* สีเขียวหลัก (Forest Green) */
+            --hover-green: #1b5e20;    /* สีเขียวตอนเอาเมาส์ชี้ */
+            --bg-mint: #e8f5e9;        /* สีพื้นหลังเขียวอ่อนๆ */
+            --text-dark: #37474f;      /* สีตัวอักษรเทาเข้ม */
+            --text-light: #78909c;     /* สีตัวอักษรเทาอ่อน */
+            --error-red: #d32f2f;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-mint);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 16px; /* มุมโค้งมนมากขึ้น */
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1); /* เงาสีเขียวอ่อนๆ */
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        h2 {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Style Inputs */
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #cfd8dc;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-green); /* เปลี่ยนสีขอบเมื่อคลิก */
+        }
+
+        /* Style Buttons */
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--hover-green);
+        }
+        
+        button:active {
+            transform: scale(0.98); /* กดแล้วยุบลงนิดนึง */
+        }
+
+        button:disabled {
+            background-color: var(--text-light);
+            cursor: not-allowed;
+        }
+
+        /* Helper Classes */
         .hidden { display: none; }
-        #error-msg { color: red; margin-top: 10px; font-size: 0.9em; }
-        #result-area { margin-top: 20px; text-align: left; background: #f9f9f9; padding: 10px; border-radius: 5px; }
-        .row-item { margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .timer { font-weight: bold; color: #d9534f; }
+        .timer { font-weight: bold; color: var(--error-red); }
+        #error-msg { color: var(--error-red); margin-top: 15px; font-size: 0.95em; }
+
+        /* --- Result Area Styling --- */
+        #result-area {
+            margin-top: 30px;
+            text-align: left;
+            /* background: var(--bg-mint); เอาพื้นหลังออกเพื่อให้ดูคลีนขึ้น */
+            padding: 5px 0;
+        }
+        
+        #result-area h3 {
+            color: var(--primary-green);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-mint);
+        }
+
+        .result-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .row-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eceff1;
+            font-size: 15px;
+        }
+        
+        /* ส่วนที่เป็นหัวข้อ (ด้านซ้าย) */
+        .row-item .label {
+            font-weight: 600;
+            color: var(--primary-green);
+            flex-basis: 40%; /* ความกว้างของหัวข้อ */
+            padding-right: 10px;
+        }
+
+        /* ส่วนที่เป็นข้อมูล (ด้านขวา) */
+        .row-item .value {
+            color: var(--text-dark);
+            flex-basis: 60%;
+            text-align: right;
+            word-break: break-word; /* ให้ตัดคำถ้ายาวเกิน */
+        }
+
+        .btn-logout {
+            background-color: var(--white);
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+            margin-top: 30px;
+        }
+        .btn-logout:hover {
+            background-color: #f5f5f5;
+            color: var(--text-dark);
+        }
+
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -25,31 +164,32 @@
         <div id="login-section">
             <h2>เข้าสู่ระบบคลังน้ำมัน</h2>
             <p id="lock-status" class="hidden">ระบบถูกระงับชั่วคราว <span id="timer-display" class="timer"></span></p>
-            <input type="password" id="access-code" placeholder="กรอกรหัสผ่าน">
+            <input type="password" id="access-code" placeholder="กรอกรหัสผ่านเข้าใช้งาน">
             <button id="btn-login" onclick="checkLogin()">เข้าสู่ระบบ</button>
             <p id="error-msg"></p>
         </div>
 
         <div id="search-section" class="hidden">
             <h2>ค้นหาข้อมูล PO</h2>
-            <input type="text" id="po-input" placeholder="ระบุเลข PO">
-            <button onclick="searchPO()">ค้นหา</button>
+            <input type="text" id="po-input" placeholder="ระบุเลข PO ที่ต้องการค้นหา">
+            <button onclick="searchPO()">ค้นหาข้อมูล</button>
+            
             <div id="result-area"></div>
-            <br>
-            <button onclick="logout()" style="background-color: #6c757d;">ออกจากระบบ</button>
+            
+            <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
         </div>
     </div>
 
     <script>
-        // ----------------------------------------------------
-        // วาง URL ของ Google Apps Script ที่นี่
+        // ====================================================
+        // ⚠️⚠️⚠️ ใส่ URL ของคุณที่ได้จากการ Deploy ตรงนี้ ⚠️⚠️⚠️
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywu7Y1NxgCqtlEZadwI9KsSsrbRujKfiBR66d1Mt-KwWwHpDFcdWu-_VkY3Ia-OMAk_Q/exec'; 
-        // ----------------------------------------------------
+        // ====================================================
 
         let attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
         let lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
+        let countdownInterval;
 
-        // เช็คเวลาล็อคเมื่อเปิดเว็บ
         checkLockout();
 
         function checkLockout() {
@@ -65,14 +205,15 @@
             document.getElementById('access-code').disabled = true;
             document.getElementById('btn-login').disabled = true;
             document.getElementById('lock-status').classList.remove('hidden');
+            document.getElementById('error-msg').innerText = "";
             
-            // นับถอยหลัง
-            const interval = setInterval(() => {
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const diff = lockUntil - now;
                 
                 if (diff <= 0) {
-                    clearInterval(interval);
+                    clearInterval(countdownInterval);
                     enableLogin();
                 } else {
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -84,49 +225,55 @@
 
         function enableLogin() {
             localStorage.removeItem('lock_until');
-            // ไม่รีเซ็ต attempts จนกว่าจะล็อกอินผ่าน หรือครบกำหนด
-            if (new Date().getTime() > lockUntil) {
-                 // อาจจะเลือก reset attempts หรือคงไว้ขึ้นอยู่กับ policy
-            }
             document.getElementById('access-code').disabled = false;
             document.getElementById('btn-login').disabled = false;
             document.getElementById('lock-status').classList.add('hidden');
-            document.getElementById('error-msg').innerText = "";
+            document.getElementById('timer-display').innerText = "";
+            if (attempts > 0 && new Date().getTime() > lockUntil) {
+                 // Optional: reset attempts after lockout period expires
+                 // attempts = 0; 
+                 // localStorage.setItem('login_attempts', 0);
+            }
         }
 
         async function checkLogin() {
-            const code = document.getElementById('access-code').value;
+            const codeInput = document.getElementById('access-code');
+            const code = codeInput.value.trim();
             const btn = document.getElementById('btn-login');
+            const errorMsg = document.getElementById('error-msg');
             
-            if (!code) return;
+            if (!code) {
+                errorMsg.innerText = "กรุณากรอกรหัสผ่าน";
+                return;
+            }
 
             btn.innerText = "กำลังตรวจสอบ...";
             btn.disabled = true;
+            errorMsg.innerText = "";
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=login&code=${code}`);
+                // ใช้ encodeURIComponent เพื่อป้องกันปัญหารหัสผ่านมีอักขระพิเศษ
+                const response = await fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // ล็อกอินสำเร็จ
                     attempts = 0;
                     localStorage.setItem('login_attempts', 0);
                     localStorage.removeItem('lock_until');
                     
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('search-section').classList.remove('hidden');
+                    codeInput.value = ""; // clear input
                 } else {
-                    // รหัสผิด
                     handleFailedLogin();
                 }
             } catch (error) {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+                console.error(error);
+                errorMsg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
             } finally {
                 btn.innerText = "เข้าสู่ระบบ";
-                btn.disabled = false;
-                // เช็คสถานะล็อคอีกทีเผื่อเพิ่งโดนล็อค
-                if (new Date().getTime() < parseInt(localStorage.getItem('lock_until'))) {
-                    btn.disabled = true;
+                if (new Date().getTime() >= lockUntil) {
+                     btn.disabled = false;
                 }
             }
         }
@@ -146,41 +293,66 @@
                 lockUntil = new Date().getTime() + waitTime;
                 localStorage.setItem('lock_until', lockUntil);
                 checkLockout();
-                alert("คุณกรอกผิดเกินจำนวนครั้งที่กำหนด! ระบบจะระงับการใช้งานชั่วคราว");
+                alert(`คุณกรอกผิดครบ ${attempts} ครั้ง ระบบจะระงับการใช้งานชั่วคราว`);
             } else {
+                document.getElementById('error-msg').innerText = `รหัสผิด โปรดติดต่อ ส่วนสนับสนุนคลังน้ำมัน (ผิดครั้งที่ ${attempts})`;
                 alert("รหัสผิด โปรดติดต่อ ส่วนสนับสนุนคลังน้ำมัน");
-                document.getElementById('error-msg').innerText = `รหัสไม่ถูกต้อง (ครั้งที่ ${attempts})`;
             }
         }
 
         async function searchPO() {
-            const po = document.getElementById('po-input').value;
+            const poInput = document.getElementById('po-input');
+            const po = poInput.value.trim();
             const resultArea = document.getElementById('result-area');
             
-            if(!po) return;
+            if(!po) {
+                alert("กรุณาระบุเลข PO");
+                return;
+            }
 
-            resultArea.innerHTML = "กำลังค้นหา...";
+            resultArea.innerHTML = "<p style='text-align:center; color:var(--primary-green);'>กำลังค้นหาข้อมูล...</p>";
             
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=search&po=${po}`);
+                const response = await fetch(`${SCRIPT_URL}?action=search&po=${encodeURIComponent(po)}`);
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data) {
-                    let html = "<h3>ผลการค้นหา:</h3>";
+                    
+                    // --- ส่วนที่แก้ไขการแสดงผล ---
+                    let html = "<h3>ผลการค้นหา:</h3><ul class='result-list'>";
+                    const headers = result.headers; // รับค่าหัวตารางที่ส่งมา
+                    
                     result.data.forEach((item, index) => {
-                        html += `<div class='row-item'><strong>Col ${index+1}:</strong> ${item}</div>`;
+                        // ตรวจสอบว่ามีหัวตารางไหม ถ้าไม่มีให้ใช้ "Col X" เหมือนเดิม
+                        let headerName = (headers && headers[index]) ? headers[index] : `Col ${index+1}`;
+                        
+                        // สร้าง HTML แบบใหม่ ใช้ Flexbox จัดหน้า
+                        html += `
+                            <li class='row-item'>
+                                <span class='label'>${headerName}:</span> 
+                                <span class='value'>${item}</span>
+                            </li>`;
                     });
+                    html += "</ul>";
+                    // ---------------------------
+                    
                     resultArea.innerHTML = html;
                 } else {
-                    resultArea.innerHTML = "<span style='color:red'>ไม่พบข้อมูล PO นี้</span>";
+                    resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>ไม่พบข้อมูล PO นี้ในระบบ</p>";
                 }
             } catch (error) {
-                resultArea.innerHTML = "เกิดข้อผิดพลาดในการดึงข้อมูล";
+                console.error(error);
+                resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูล</p>";
             }
         }
 
         function logout() {
-            location.reload();
+            // รีเซ็ตหน้าจอเพื่อกลับไปหน้าล็อกอิน
+            document.getElementById('search-section').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('po-input').value = "";
+            document.getElementById('result-area').innerHTML = "";
+            // ถ้าต้องการให้โหลดหน้าใหม่เลยให้ใช้ location.reload();
         }
     </script>
 </body>
