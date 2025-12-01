@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบค้นหา PO - คลังน้ำมัน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- Minimalist Green Theme --- */
+        /* --- Minimalist Theme Variables --- */
         :root {
-            --primary-green: #2e7d32;
-            --hover-green: #1b5e20;
-            --bg-mint: #e8f5e9;
-            --text-dark: #37474f;
-            --text-light: #78909c;
-            --error-red: #d32f2f;
+            --primary-green: #2e7d32;   /* เขียวหลัก */
+            --hover-green: #1b5e20;     /* เขียวเข้ม */
+            --bg-mint: #e8f5e9;         /* พื้นหลังเว็บ */
+            --text-dark: #37474f;       /* สีตัวอักษร */
+            --text-light: #78909c;      /* สีตัวอักษรจาง */
+            --error-red: #c62828;       /* แดงเข้ม (ตัวหนังสือ) */
+            --bg-red: #ffebee;          /* แดงอ่อน (พื้นหลังการ์ด error) */
             --white: #ffffff;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         body {
@@ -24,7 +24,7 @@
             color: var(--text-dark);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* เปลี่ยนเป็น start เพื่อให้ scroll ได้ถ้ายาว */
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 40px 20px;
@@ -37,14 +37,18 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1);
             width: 100%;
-            max-width: 550px; /* ขยายความกว้างนิดหน่อย */
+            max-width: 550px;
             text-align: center;
             transition: all 0.3s ease;
         }
 
-        h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
+        h2 {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
 
-        /* Input & Textarea Styling */
+        /* Input & Textarea */
         input, textarea {
             width: 100%;
             padding: 14px;
@@ -59,12 +63,15 @@
         
         textarea {
             resize: vertical;
-            min-height: 100px; /* สูงขึ้นเพื่อรองรับหลายบรรทัด */
+            min-height: 120px;
         }
 
-        input:focus, textarea:focus { outline: none; border-color: var(--primary-green); }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
 
-        /* Button Styling */
+        /* Buttons */
         button {
             width: 100%;
             padding: 14px;
@@ -83,44 +90,58 @@
         button:active { transform: scale(0.98); }
         button:disabled { background-color: var(--text-light); cursor: not-allowed; }
 
+        /* Helpers */
         .hidden { display: none; }
         .timer { font-weight: bold; color: var(--error-red); }
         #error-msg { color: var(--error-red); margin-top: 15px; font-size: 0.95em; }
-        .hint-text { font-size: 0.85em; color: var(--text-light); text-align: left; margin-top: -5px; margin-bottom: 10px;}
+        .hint-text { font-size: 0.85em; color: var(--text-light); text-align: left; margin-bottom: 10px; }
 
-        /* --- Result Area Styling --- */
+        /* --- Result Card Styling (ส่วนสำคัญที่แก้สี) --- */
         #result-area { margin-top: 30px; text-align: left; }
         
-        /* สไตล์สำหรับการ์ดแต่ละ PO ที่เจอ */
         .result-card {
-            background-color: #f1f8e9; /* เขียวอ่อนจางๆ */
             border: 1px solid #c8e6c9;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
             position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
         }
-        
-        /* แทบสีด้านซ้ายของการ์ด */
-        .result-card::before {
+
+        /* สไตล์: สำเร็จ (สีเขียว) */
+        .result-card.status-success {
+            background-color: #f1f8e9; 
+            border-color: #a5d6a7;
+        }
+        .result-card.status-success::before {
             content: '';
-            position: absolute;
-            left: 0;
-            top: 10px;
-            bottom: 10px;
-            width: 5px;
+            position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px;
             background-color: var(--primary-green);
-            border-top-right-radius: 3px;
-            border-bottom-right-radius: 3px;
+            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
         }
+        .result-card.status-success h3 { color: var(--primary-green); }
+
+        /* สไตล์: ยังไม่สำเร็จ (สีแดง) */
+        .result-card.status-pending {
+            background-color: var(--bg-red);
+            border-color: #ef9a9a;
+        }
+        .result-card.status-pending::before {
+            content: '';
+            position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px;
+            background-color: var(--error-red);
+            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
+        }
+        .result-card.status-pending h3 { color: var(--error-red); }
 
         .result-card h3 {
             margin-top: 0;
-            color: var(--primary-green);
             font-size: 1.1rem;
-            border-bottom: 1px solid #c8e6c9;
+            border-bottom: 1px solid rgba(0,0,0,0.1); /* เส้นคั่นจางๆ */
             padding-bottom: 8px;
             margin-bottom: 10px;
+            padding-left: 10px;
         }
 
         .row-item {
@@ -128,11 +149,14 @@
             justify-content: space-between;
             margin-bottom: 8px;
             font-size: 15px;
+            padding-left: 10px;
+            align-items: center; /* จัดกึ่งกลางแนวตั้ง */
         }
         
         .row-item .label {
             font-weight: 600;
-            color: var(--primary-green);
+            color: var(--text-dark);
+            opacity: 0.8;
             flex-basis: 40%;
             padding-right: 10px;
         }
@@ -142,6 +166,27 @@
             flex-basis: 60%;
             text-align: right;
             word-break: break-word;
+        }
+
+        /* Badge สำหรับเน้นคำว่าสถานะ */
+        .status-badge {
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 0.95em;
+        }
+        
+        .status-badge.success {
+            color: var(--primary-green);
+            background-color: rgba(255,255,255,0.7);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .status-badge.pending {
+            color: var(--error-red);
+            background-color: rgba(255,255,255,0.7);
+            border: 1px solid var(--error-red);
         }
 
         .btn-logout {
@@ -167,8 +212,8 @@
 
         <div id="search-section" class="hidden">
             <h2>ค้นหาข้อมูล PO</h2>
-            <textarea id="po-input" placeholder="ระบุเลข PO (ค้นหาได้หลายรายการ)&#10;เช่น:&#10;4900142335&#10;4900142336"></textarea>
-            <p class="hint-text">*คั่นแต่ละเลขด้วยการเว้นวรรค หรือขึ้นบรรทัดใหม่</p>
+            <p class="hint-text">ระบุได้หลาย PO (คั่นด้วยการขึ้นบรรทัดใหม่)</p>
+            <textarea id="po-input" placeholder="ตัวอย่าง:&#10;4900142335&#10;4900142336"></textarea>
             
             <button onclick="searchPO()">ค้นหาข้อมูล</button>
             
@@ -180,7 +225,7 @@
 
     <script>
         // ====================================================
-        // ⚠️⚠️⚠️ ใส่ URL Apps Script ของคุณตรงนี้ ⚠️⚠️⚠️
+        // ⚠️⚠️⚠️ วาง URL ของ Google Apps Script ที่นี่ ⚠️⚠️⚠️
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywu7Y1NxgCqtlEZadwI9KsSsrbRujKfiBR66d1Mt-KwWwHpDFcdWu-_VkY3Ia-OMAk_Q/exec'; 
         // ====================================================
 
@@ -235,10 +280,7 @@
             const btn = document.getElementById('btn-login');
             const errorMsg = document.getElementById('error-msg');
             
-            if (!code) {
-                errorMsg.innerText = "กรุณากรอกรหัสผ่าน";
-                return;
-            }
+            if (!code) { errorMsg.innerText = "กรุณากรอกรหัสผ่าน"; return; }
 
             btn.innerText = "กำลังตรวจสอบ...";
             btn.disabled = true;
@@ -260,6 +302,7 @@
                     handleFailedLogin();
                 }
             } catch (error) {
+                console.error(error);
                 errorMsg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
             } finally {
                 btn.innerText = "เข้าสู่ระบบ";
@@ -271,6 +314,7 @@
             attempts++;
             localStorage.setItem('login_attempts', attempts);
             let waitTime = 0;
+
             if (attempts >= 10) waitTime = 60 * 60 * 1000;
             else if (attempts >= 3) waitTime = 20 * 60 * 1000;
 
@@ -298,23 +342,33 @@
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data && result.data.length > 0) {
-                    let html = `<p style="text-align:left; font-weight:bold;">พบข้อมูล ${result.data.length} รายการ:</p>`;
+                    let html = `<p style="text-align:left; font-weight:bold; color:var(--primary-green);">พบข้อมูล ${result.data.length} รายการ:</p>`;
                     const headers = result.headers;
                     
-                    // Loop ผ่านผลลัพธ์ทุกรายการที่เจอ
+                    // Loop แสดงผลทีละการ์ด
                     result.data.forEach((rowData, resultIndex) => {
-                        // สร้าง Card สำหรับแต่ละ PO
-                        html += `<div class='result-card'>`;
-                        // แสดงหัวข้อ PO (เอามาจากข้อมูลตัวแรกของแถว)
+                        // 1. ตรวจสอบสถานะ: ถ้ามีคำว่า "ยังจัดส่งไม่สำเร็จ" ถือเป็น Pending
+                        let isPending = rowData.some(item => item.toString().includes("ยังจัดส่งไม่สำเร็จ"));
+                        let cardClass = isPending ? 'status-pending' : 'status-success';
+                        
+                        html += `<div class='result-card ${cardClass}'>`;
                         html += `<h3>#${resultIndex + 1} - PO: ${rowData[0]}</h3>`;
                         
+                        // Loop แสดงข้อมูลทีละบรรทัด
                         rowData.forEach((item, index) => {
-                            // ข้าม Col 0 ไปก็ได้ เพราะเอาไปโชว์ตรงหัวข้อแล้ว หรือจะโชว์ซ้ำก็ได้
                             let headerName = (headers && headers[index]) ? headers[index] : `Col ${index+1}`;
+                            let displayValue = item;
+
+                            // 2. ถ้าเจอข้อความสถานะ ให้ใส่ Badge สวยๆ
+                            if (item.toString().includes("จัดส่งสำเร็จ") || item.toString().includes("ยังจัดส่งไม่สำเร็จ")) {
+                                let badgeClass = item.toString().includes("ยัง") ? 'pending' : 'success';
+                                displayValue = `<span class='status-badge ${badgeClass}'>${item}</span>`;
+                            }
+
                             html += `
                                 <div class='row-item'>
                                     <span class='label'>${headerName}:</span> 
-                                    <span class='value'>${item}</span>
+                                    <span class='value'>${displayValue}</span>
                                 </div>`;
                         });
                         html += `</div>`;
