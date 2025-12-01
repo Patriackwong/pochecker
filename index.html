@@ -9,12 +9,12 @@
         /* --- Minimalist Theme Variables --- */
         :root {
             --primary-green: #2e7d32;   /* เขียวหลัก */
-            --hover-green: #1b5e20;     /* เขียวเข้ม */
             --bg-mint: #e8f5e9;         /* พื้นหลังเว็บ */
-            --text-dark: #37474f;       /* สีตัวอักษร */
-            --text-light: #78909c;      /* สีตัวอักษรจาง */
-            --error-red: #c62828;       /* แดงเข้ม (ตัวหนังสือ) */
-            --bg-red: #ffebee;          /* แดงอ่อน (พื้นหลังการ์ด error) */
+            --text-dark: #37474f;
+            --text-light: #78909c;
+            --error-red: #d32f2f;       /* แดงเข้ม */
+            --bg-red-light: #ffebee;    /* พื้นหลังการ์ดแดง */
+            --bg-green-light: #f1f8e9;  /* พื้นหลังการ์ดเขียว */
             --white: #ffffff;
         }
 
@@ -39,164 +39,117 @@
             width: 100%;
             max-width: 550px;
             text-align: center;
-            transition: all 0.3s ease;
         }
 
-        h2 {
-            color: var(--primary-green);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
+        h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
 
-        /* Input & Textarea */
+        /* Input & Button Styles */
         input, textarea {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 2px solid #cfd8dc;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            width: 100%; padding: 14px; margin: 10px 0;
+            border: 2px solid #cfd8dc; border-radius: 10px;
+            box-sizing: border-box; font-family: 'Sarabun', sans-serif; font-size: 16px;
         }
-        
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
+        textarea { resize: vertical; min-height: 120px; }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-green); }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-green);
-        }
-
-        /* Buttons */
         button {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary-green);
-            color: var(--white);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
-            transition: background-color 0.3s, transform 0.1s;
-            margin-top: 10px;
+            width: 100%; padding: 14px; background-color: var(--primary-green);
+            color: var(--white); border: none; border-radius: 10px; cursor: pointer;
+            font-size: 18px; font-weight: 600; margin-top: 10px;
+            transition: all 0.3s;
         }
-
-        button:hover { background-color: var(--hover-green); }
-        button:active { transform: scale(0.98); }
+        button:hover { filter: brightness(90%); }
         button:disabled { background-color: var(--text-light); cursor: not-allowed; }
 
         /* Helpers */
         .hidden { display: none; }
         .timer { font-weight: bold; color: var(--error-red); }
-        #error-msg { color: var(--error-red); margin-top: 15px; font-size: 0.95em; }
+        #error-msg { color: var(--error-red); margin-top: 15px; }
         .hint-text { font-size: 0.85em; color: var(--text-light); text-align: left; margin-bottom: 10px; }
 
-        /* --- Result Card Styling (ส่วนสำคัญที่แก้สี) --- */
+        /* --- Result Card Styling (ปรับปรุงใหม่) --- */
         #result-area { margin-top: 30px; text-align: left; }
         
         .result-card {
-            border: 1px solid #c8e6c9;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
             position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden; /* เพื่อให้แถบสีไม่ล้น */
         }
 
-        /* สไตล์: สำเร็จ (สีเขียว) */
+        /* สถานะ: สำเร็จ (สีเขียว) */
         .result-card.status-success {
-            background-color: #f1f8e9; 
-            border-color: #a5d6a7;
+            background-color: var(--bg-green-light);
+            border: 1px solid #a5d6a7;
         }
         .result-card.status-success::before {
-            content: '';
-            position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
             background-color: var(--primary-green);
-            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
         }
         .result-card.status-success h3 { color: var(--primary-green); }
 
-        /* สไตล์: ยังไม่สำเร็จ (สีแดง) */
+        /* สถานะ: ไม่สำเร็จ (สีแดง) */
         .result-card.status-pending {
-            background-color: var(--bg-red);
-            border-color: #ef9a9a;
+            background-color: var(--bg-red-light);
+            border: 1px solid #ef9a9a;
         }
         .result-card.status-pending::before {
-            content: '';
-            position: absolute; left: 0; top: 10px; bottom: 10px; width: 5px;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
             background-color: var(--error-red);
-            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
         }
         .result-card.status-pending h3 { color: var(--error-red); }
 
         .result-card h3 {
-            margin-top: 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1); /* เส้นคั่นจางๆ */
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            padding-left: 10px;
+            margin-top: 0; font-size: 1.2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 10px; margin-bottom: 15px; padding-left: 10px;
         }
 
         .row-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 15px;
-            padding-left: 10px;
-            align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; font-size: 15px; padding-left: 10px;
         }
         
         .row-item .label {
-            font-weight: 600;
-            color: var(--text-dark);
-            opacity: 0.8;
-            flex-basis: 40%;
-            padding-right: 10px;
+            font-weight: 600; color: var(--text-dark); opacity: 0.8;
+            flex-basis: 40%; padding-right: 10px;
         }
 
         .row-item .value {
-            color: var(--text-dark);
-            flex-basis: 60%;
-            text-align: right;
+            color: var(--text-dark); flex-basis: 60%; text-align: right;
             word-break: break-word;
         }
 
-        /* Badge สำหรับเน้นคำว่าสถานะ */
+        /* --- BADGE STYLING (จุดที่ทำให้เด่น) --- */
         .status-badge {
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
             display: inline-block;
-            font-size: 0.95em;
+            padding: 6px 12px;
+            border-radius: 20px; /* ทรงแคปซูล */
+            font-weight: 700;
+            font-size: 1em;
+            color: white; /* ตัวหนังสือสีขาว */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
+        /* ป้ายเขียว */
         .status-badge.success {
-            color: var(--primary-green);
-            background-color: rgba(255,255,255,0.7);
-            border: 1px solid var(--primary-green);
+            background-color: var(--primary-green);
         }
         
+        /* ป้ายแดง */
         .status-badge.pending {
-            color: var(--error-red);
-            background-color: rgba(255,255,255,0.7);
-            border: 1px solid var(--error-red);
+            background-color: var(--error-red);
         }
 
         .btn-logout {
-            background-color: var(--white);
-            color: var(--text-light);
-            border: 2px solid var(--text-light);
-            margin-top: 20px;
+            background-color: var(--white); color: var(--text-light);
+            border: 2px solid #cfd8dc; margin-top: 20px;
         }
         .btn-logout:hover { background-color: #f5f5f5; color: var(--text-dark); }
-
     </style>
 </head>
 <body>
@@ -237,11 +190,7 @@
 
         function checkLockout() {
             const now = new Date().getTime();
-            if (now < lockUntil) {
-                disableLogin(lockUntil - now);
-            } else {
-                enableLogin();
-            }
+            if (now < lockUntil) { disableLogin(lockUntil - now); } else { enableLogin(); }
         }
 
         function disableLogin(remainingTime) {
@@ -249,19 +198,15 @@
             document.getElementById('btn-login').disabled = true;
             document.getElementById('lock-status').classList.remove('hidden');
             document.getElementById('error-msg').innerText = "";
-            
             clearInterval(countdownInterval);
             countdownInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const diff = lockUntil - now;
-                
-                if (diff <= 0) {
-                    clearInterval(countdownInterval);
-                    enableLogin();
-                } else {
+                if (diff <= 0) { clearInterval(countdownInterval); enableLogin(); }
+                else {
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    document.getElementById('timer-display').innerText = `กรุณารอ ${minutes} นาที ${seconds} วินาที`;
+                    document.getElementById('timer-display').innerText = `รอ ${minutes} นาที ${seconds} วินาที`;
                 }
             }, 1000);
         }
@@ -282,50 +227,32 @@
             
             if (!code) { errorMsg.innerText = "กรุณากรอกรหัสผ่าน"; return; }
 
-            btn.innerText = "กำลังตรวจสอบ...";
-            btn.disabled = true;
-            errorMsg.innerText = "";
+            btn.innerText = "กำลังตรวจสอบ..."; btn.disabled = true; errorMsg.innerText = "";
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    attempts = 0;
-                    localStorage.setItem('login_attempts', 0);
-                    localStorage.removeItem('lock_until');
-                    
+                    attempts = 0; localStorage.setItem('login_attempts', 0); localStorage.removeItem('lock_until');
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('search-section').classList.remove('hidden');
                     codeInput.value = "";
-                } else {
-                    handleFailedLogin();
-                }
-            } catch (error) {
-                console.error(error);
-                errorMsg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
-            } finally {
-                btn.innerText = "เข้าสู่ระบบ";
-                if (new Date().getTime() >= lockUntil) { btn.disabled = false; }
-            }
+                } else { handleFailedLogin(); }
+            } catch (error) { errorMsg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ"; } 
+            finally { btn.innerText = "เข้าสู่ระบบ"; if (new Date().getTime() >= lockUntil) { btn.disabled = false; } }
         }
 
         function handleFailedLogin() {
-            attempts++;
-            localStorage.setItem('login_attempts', attempts);
+            attempts++; localStorage.setItem('login_attempts', attempts);
             let waitTime = 0;
-
             if (attempts >= 10) waitTime = 60 * 60 * 1000;
             else if (attempts >= 3) waitTime = 20 * 60 * 1000;
 
             if (waitTime > 0) {
-                lockUntil = new Date().getTime() + waitTime;
-                localStorage.setItem('lock_until', lockUntil);
-                checkLockout();
-                alert(`คุณกรอกผิดครบ ${attempts} ครั้ง ระบบจะระงับการใช้งานชั่วคราว`);
-            } else {
-                document.getElementById('error-msg').innerText = `รหัสผิด (ครั้งที่ ${attempts})`;
-            }
+                lockUntil = new Date().getTime() + waitTime; localStorage.setItem('lock_until', lockUntil);
+                checkLockout(); alert(`ผิดครบ ${attempts} ครั้ง ระบบระงับการใช้งานชั่วคราว`);
+            } else { document.getElementById('error-msg').innerText = `รหัสผิด (ครั้งที่ ${attempts})`; }
         }
 
         async function searchPO() {
@@ -345,24 +272,34 @@
                     let html = `<p style="text-align:left; font-weight:bold; color:var(--primary-green);">พบข้อมูล ${result.data.length} รายการ:</p>`;
                     const headers = result.headers;
                     
-                    // Loop แสดงผลทีละการ์ด
                     result.data.forEach((rowData, resultIndex) => {
-                        // 1. ตรวจสอบสถานะ: ถ้ามีคำว่า "ยังจัดส่งไม่สำเร็จ" ถือเป็น Pending
-                        let isPending = rowData.some(item => item.toString().includes("ยังจัดส่งไม่สำเร็จ"));
+                        // --- 1. ตรวจสอบสถานะ (Logic ใหม่: หาคำว่า "ไม่สำเร็จ" คำเดียวพอ) ---
+                        // วิธีนี้จะแม่นยำกว่าการหาคำยาวๆ
+                        let rowString = rowData.join(" "); // รวมข้อความทั้งแถวมาเช็ค
+                        let isPending = rowString.includes("ไม่สำเร็จ"); 
+
                         let cardClass = isPending ? 'status-pending' : 'status-success';
                         
                         html += `<div class='result-card ${cardClass}'>`;
                         html += `<h3>#${resultIndex + 1} - PO: ${rowData[0]}</h3>`;
                         
-                        // Loop แสดงข้อมูลทีละบรรทัด
                         rowData.forEach((item, index) => {
                             let headerName = (headers && headers[index]) ? headers[index] : `Col ${index+1}`;
                             let displayValue = item;
+                            let itemStr = item.toString();
 
-                            // 2. ถ้าเจอข้อความสถานะ ให้ใส่ Badge สวยๆ
-                            if (item.toString().includes("จัดส่งสำเร็จ") || item.toString().includes("ยังจัดส่งไม่สำเร็จ")) {
-                                let badgeClass = item.toString().includes("ยัง") ? 'pending' : 'success';
-                                displayValue = `<span class='status-badge ${badgeClass}'>${item}</span>`;
+                            // --- 2. สร้างป้ายสถานะ (Badge) ---
+                            // เช็คคำว่า "สำเร็จ" หรือ "ไม่สำเร็จ"
+                            if (itemStr.includes("สำเร็จ") || itemStr.includes("ยังไม่")) {
+                                
+                                // ถ้ามีคำว่า "ไม่" หรือ "ยังไม่" -> สีแดง (Pending)
+                                if (itemStr.includes("ไม่") || itemStr.includes("ยังไม่")) {
+                                    displayValue = `<span class='status-badge pending'>${item}</span>`;
+                                } 
+                                // ถ้าไม่มีคำว่า "ไม่" แต่มีคำว่า "สำเร็จ" หรือ "Done" -> สีเขียว (Success)
+                                else {
+                                    displayValue = `<span class='status-badge success'>${item}</span>`;
+                                }
                             }
 
                             html += `
@@ -376,20 +313,15 @@
                     
                     resultArea.innerHTML = html;
                 } else {
-                    resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>ไม่พบข้อมูล PO ที่ระบุในระบบ</p>";
+                    resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>ไม่พบข้อมูล PO นี้</p>";
                 }
             } catch (error) {
                 console.error(error);
-                resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูล</p>";
+                resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>เกิดข้อผิดพลาด</p>";
             }
         }
 
-        function logout() {
-            document.getElementById('search-section').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-            document.getElementById('po-input').value = "";
-            document.getElementById('result-area').innerHTML = "";
-        }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
