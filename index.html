@@ -16,6 +16,7 @@
             --bg-red-light: #ffebee;
             --bg-green-light: #f1f8e9;
             --white: #ffffff;
+            --excel-orange: #f57c00; /* สีปุ่ม Excel */
         }
 
         body {
@@ -31,20 +32,19 @@
             box-sizing: border-box;
         }
 
-        /* ปรับ container ให้กว้างขึ้นเพื่อรองรับ 2 คอลัมน์ */
         .container {
             background: var(--white);
             padding: 2.5rem;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1);
             width: 100%;
-            max-width: 900px; /* ขยายความกว้าง */
+            max-width: 900px;
             text-align: center;
         }
 
         h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
 
-        /* Input & Button */
+        /* Input & Textarea */
         input, textarea {
             width: 100%; padding: 14px; margin: 10px 0;
             border: 2px solid #cfd8dc; border-radius: 10px;
@@ -53,6 +53,7 @@
         textarea { resize: vertical; min-height: 100px; }
         input:focus, textarea:focus { outline: none; border-color: var(--primary-green); }
 
+        /* Buttons */
         button {
             width: 100%; padding: 14px; background-color: var(--primary-green);
             color: var(--white); border: none; border-radius: 10px; cursor: pointer;
@@ -61,6 +62,13 @@
         }
         button:hover { filter: brightness(90%); }
         button:disabled { background-color: var(--text-light); cursor: not-allowed; }
+
+        /* ปุ่ม Excel Export (สีส้ม) */
+        .btn-excel {
+            background-color: var(--excel-orange);
+            margin-bottom: 20px;
+        }
+        .btn-excel:hover { background-color: #ef6c00; }
 
         .hidden { display: none; }
         .timer { font-weight: bold; color: var(--error-red); }
@@ -76,11 +84,10 @@
         }
         
         .col-left, .col-right {
-            flex: 1; /* แบ่งครึ่งเท่ากัน */
-            min-width: 0; /* ป้องกัน layout พังเมื่อข้อความยาว */
+            flex: 1; 
+            min-width: 0;
         }
 
-        /* หัวข้อคอลัมน์ */
         .col-header {
             font-weight: 700;
             font-size: 1.1rem;
@@ -100,10 +107,9 @@
             margin-bottom: 15px;
             position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            background-color: white; /* พื้นหลังการ์ดขาว */
+            background-color: white;
         }
 
-        /* สไตล์เฉพาะการ์ด */
         .result-card.status-success { border-left: 5px solid var(--primary-green); }
         .result-card.status-pending { border-left: 5px solid var(--error-red); }
 
@@ -122,7 +128,6 @@
         .row-item .label { font-weight: 600; color: var(--text-dark); opacity: 0.8; flex-basis: 40%; }
         .row-item .value { color: var(--text-dark); flex-basis: 60%; text-align: right; word-break: break-word; }
 
-        /* Badge */
         .status-badge {
             display: inline-block; padding: 4px 10px; border-radius: 15px;
             font-weight: 700; font-size: 0.9em; color: white;
@@ -133,7 +138,6 @@
 
         .btn-logout { background-color: var(--white); color: var(--text-light); border: 2px solid #cfd8dc; margin-top: 20px; }
 
-        /* Mobile Responsive: จอเล็กให้เรียงลงมา */
         @media (max-width: 768px) {
             .result-columns { flex-direction: column; }
             .container { padding: 1.5rem; }
@@ -158,7 +162,9 @@
             
             <button onclick="searchPO()">ค้นหาข้อมูล</button>
             
-            <div id="result-area"></div>
+            <div id="result-area" style="margin-top: 30px;"></div>
+
+            <button id="btn-export" class="btn-excel hidden" onclick="exportToExcel()">📥 ดาวน์โหลดไฟล์ Excel</button>
             
             <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
         </div>
@@ -173,6 +179,10 @@
         let attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
         let lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
         let countdownInterval;
+
+        // ตัวแปรสำหรับเก็บข้อมูลไว้ Export
+        let currentExportData = [];
+        let currentExportHeaders = [];
 
         checkLockout();
 
@@ -245,10 +255,12 @@
             const poInput = document.getElementById('po-input');
             const po = poInput.value.trim();
             const resultArea = document.getElementById('result-area');
+            const btnExport = document.getElementById('btn-export');
             
             if(!po) { alert("กรุณาระบุเลข PO"); return; }
 
             resultArea.innerHTML = "<p style='text-align:center; color:var(--primary-green);'>กำลังค้นหาข้อมูล...</p>";
+            btnExport.classList.add('hidden'); // ซ่อนปุ่ม Export ก่อนค้นหา
             
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=search&po=${encodeURIComponent(po)}`);
@@ -256,7 +268,12 @@
 
                 if (result.status === 'success' && result.data && result.data.length > 0) {
                     
-                    // --- เตรียมตัวแปรเก็บ HTML แยก 2 ฝั่ง ---
+                    // --- เก็บข้อมูลลงตัวแปร Global เพื่อรอ Export ---
+                    currentExportData = result.data;
+                    currentExportHeaders = result.headers;
+                    btnExport.classList.remove('hidden'); // โชว์ปุ่ม Export
+                    // -------------------------------------------
+
                     let successCards = "";
                     let pendingCards = "";
                     let successCount = 0;
@@ -268,7 +285,6 @@
                         let isPending = rowString.includes("ไม่สำเร็จ"); 
                         let cardClass = isPending ? 'status-pending' : 'status-success';
 
-                        // สร้าง HTML การ์ด
                         let cardHtml = `<div class='result-card ${cardClass}'>`;
                         cardHtml += `<h3>PO: ${rowData[0]}</h3>`;
                         
@@ -293,17 +309,13 @@
                         });
                         cardHtml += `</div>`;
 
-                        // --- แยกใส่ตะกร้าซ้าย-ขวา ---
                         if (isPending) {
-                            pendingCards += cardHtml;
-                            pendingCount++;
+                            pendingCards += cardHtml; pendingCount++;
                         } else {
-                            successCards += cardHtml;
-                            successCount++;
+                            successCards += cardHtml; successCount++;
                         }
                     });
 
-                    // --- สร้าง Layout 2 คอลัมน์ ---
                     let finalHtml = `
                         <p style="text-align:left; font-weight:bold; color:var(--text-dark);">
                             พบข้อมูลทั้งหมด ${result.data.length} รายการ
@@ -313,23 +325,60 @@
                                 <div class="col-header header-success">✅ จัดส่งสำเร็จ (${successCount})</div>
                                 ${successCards || "<p style='text-align:center; color:#ccc'>- ไม่มีรายการ -</p>"}
                             </div>
-                            
                             <div class="col-right">
                                 <div class="col-header header-pending">⏳ ยังจัดส่งไม่สำเร็จ (${pendingCount})</div>
                                 ${pendingCards || "<p style='text-align:center; color:#ccc'>- ไม่มีรายการ -</p>"}
                             </div>
                         </div>
                     `;
-                    
                     resultArea.innerHTML = finalHtml;
 
                 } else {
                     resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>ไม่พบข้อมูล PO นี้</p>";
+                    btnExport.classList.add('hidden');
                 }
             } catch (error) {
                 console.error(error);
                 resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>เกิดข้อผิดพลาด</p>";
+                btnExport.classList.add('hidden');
             }
+        }
+
+        // --- ฟังก์ชั่น Export Excel (CSV with BOM) ---
+        function exportToExcel() {
+            if (currentExportData.length === 0) {
+                alert("ไม่มีข้อมูลที่จะดาวน์โหลด");
+                return;
+            }
+
+            // 1. สร้างหัวตาราง (ถ้ามี)
+            let csvContent = "";
+            if (currentExportHeaders && currentExportHeaders.length > 0) {
+                csvContent += currentExportHeaders.map(h => `"${h}"`).join(",") + "\n";
+            }
+
+            // 2. วนลูปสร้างข้อมูลแต่ละแถว
+            currentExportData.forEach(row => {
+                let rowStr = row.map(item => {
+                    // ป้องกันกรณีมีเครื่องหมายคอมม่า (,) ในข้อมูล ให้ใส่ฟันหนูครอบ ""
+                    let cellData = item === null ? "" : item.toString();
+                    cellData = cellData.replace(/"/g, '""'); // Escape double quotes
+                    return `"${cellData}"`;
+                }).join(",");
+                csvContent += rowStr + "\n";
+            });
+
+            // 3. สร้างไฟล์ Blob พร้อม BOM (\uFEFF) เพื่อรองรับภาษาไทย
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            // 4. สร้างลิงก์ดาวน์โหลดจำลองและกดคลิก
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `PO_Export_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function logout() { location.reload(); }
