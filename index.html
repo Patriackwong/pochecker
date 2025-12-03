@@ -4,311 +4,249 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบค้นหา PO - คลังน้ำมัน</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- Theme Variables --- */
         :root {
-            --primary-green: #2e7d32; --bg-green-light: #f1f8e9;
-            --error-red: #c62828; --bg-red-light: #ffebee;
-            --warning-yellow: #f9a825; --bg-yellow-light: #fffde7;
-            --bg-mint: #e8f5e9; --text-dark: #37474f; --text-light: #78909c;
-            --white: #ffffff; --excel-orange: #f57c00;
-            --btn-blue: #1565c0; --btn-purple: #6a1b9a;
-            --btn-sheet: #0f9d58; /* สีเขียว Google Sheets */
+            --primary-green: #2e7d32; --bg-mint: #e8f5e9; --text-dark: #37474f;
+            --white: #ffffff; --btn-blue: #1565c0; --btn-purple: #6a1b9a; --btn-sheet: #0f9d58;
+            --status-success: #c8e6c9; --text-success: #2e7d32;
+            --status-warning: #fff9c4; --text-warning: #f9a825;
+            --status-error: #ffcdd2; --text-error: #c62828;
         }
 
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-mint); color: var(--text-dark); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 80px 20px 40px 20px; box-sizing: border-box; }
-        .container { background: var(--white); padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1); width: 100%; max-width: 1200px; text-align: center; }
-        h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
+        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-mint); color: var(--text-dark); margin: 0; padding-top: 80px; display: flex; justify-content: center; }
         
-        /* Top Bar */
+        /* --- Top Bar (แถบเมนูบนขวา) --- */
         .top-bar {
-            position: fixed; top: 0; right: 0; left: 0; height: 60px; padding: 0 20px;
-            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
-            background-color: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 1000; backdrop-filter: blur(5px);
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background: rgba(255,255,255,0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 0 20px; gap: 10px; z-index: 1000;
         }
+        
         .top-btn {
-            padding: 8px 15px; font-size: 14px; border-radius: 20px; border: none; color: white;
-            cursor: pointer; display: flex; align-items: center; gap: 5px; transition: transform 0.2s; font-weight: 600; text-decoration: none;
+            padding: 8px 16px; border-radius: 20px; border: none; color: white; cursor: pointer;
+            font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px;
+            text-decoration: none; transition: transform 0.2s;
         }
         .top-btn:hover { transform: translateY(-2px); filter: brightness(110%); }
         
-        .btn-up-chv { background-color: var(--btn-blue); }
-        .btn-up-mrc { background-color: var(--btn-purple); }
-        .btn-logout-mini { background-color: #eee; color: var(--text-dark); border: 1px solid #ddd; }
-        .btn-logout-mini:hover { background-color: #ddd; }
-        .btn-sheet { background-color: var(--btn-sheet); } /* สีปุ่ม Sheet */
+        .btn-chv { background-color: var(--btn-blue); }
+        .btn-mrc { background-color: var(--btn-purple); }
+        .btn-sheet { background-color: var(--btn-sheet); }
+        .btn-logout { background-color: #eee; color: #333; border: 1px solid #ddd; }
 
-        /* Inputs & Buttons */
-        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #cfd8dc; border-radius: 10px; box-sizing: border-box; font-family: 'Sarabun', sans-serif; font-size: 16px; }
-        textarea { resize: vertical; min-height: 100px; }
-        input:focus, textarea:focus { outline: none; border-color: var(--primary-green); }
-        .btn-main { width: 100%; padding: 14px; background-color: var(--primary-green); color: var(--white); border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: 600; margin-top: 10px; transition: all 0.3s; }
-        .btn-main:hover { filter: brightness(90%); }
-        .btn-excel { background-color: var(--excel-orange); margin-bottom: 20px; width: 100%; padding: 14px; border:none; border-radius:10px; color:white; font-size:16px; cursor:pointer; font-weight:600;}
+        .container { background: var(--white); padding: 30px; border-radius: 16px; width: 90%; max-width: 1000px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        
+        /* Inputs & Main Buttons */
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Sarabun'; }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-excel { background: #f57c00; margin-top: 20px; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; }
 
-        /* Utilities */
+        /* Results Layout */
+        .result-cols { display: flex; gap: 15px; margin-top: 20px; text-align: left; }
+        .col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .col-head { padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; }
+        
+        .bg-success { background: var(--status-success); color: var(--text-success); border: 1px solid #a5d6a7; }
+        .bg-warning { background: var(--status-warning); color: var(--text-warning); border: 1px solid #fff59d; }
+        .bg-error { background: var(--status-error); color: var(--text-error); border: 1px solid #ef9a9a; }
+
+        .card { background: white; border: 1px solid #eee; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .card.success { border-left: 4px solid var(--text-success); }
+        .card.warning { border-left: 4px solid var(--text-warning); }
+        .card.error { border-left: 4px solid var(--text-error); }
+        
+        .row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
+        .label { font-weight: bold; color: #555; }
+        .badge { padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; color: white; }
+        .badge.s { background: var(--text-success); }
+        .badge.w { background: var(--text-warning); }
+        .badge.e { background: var(--text-error); }
+
         .hidden { display: none !important; }
-        .timer { font-weight: bold; color: var(--error-red); }
-        #error-msg { color: var(--error-red); margin-top: 15px; }
-        .hint-text { font-size: 0.85em; color: var(--text-light); text-align: left; margin-bottom: 10px; }
-        #upload-status-mini { font-size: 13px; margin-right: 15px; font-weight: bold; }
-
-        /* Results */
-        .result-columns { display: flex; gap: 15px; margin-top: 20px; text-align: left; }
-        .col-item { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-        .col-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; text-align: center; padding: 10px; border-radius: 8px; }
-        .header-success { background-color: var(--bg-green-light); color: var(--primary-green); border: 1px solid #c8e6c9; }
-        .header-warning { background-color: var(--bg-yellow-light); color: var(--warning-yellow); border: 1px solid #fff59d; }
-        .header-pending { background-color: var(--bg-red-light); color: var(--error-red); border: 1px solid #ffcdd2; }
-
-        .result-card { border: 1px solid #ddd; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background-color: white; }
-        .result-card.status-success { border-left: 5px solid var(--primary-green); }
-        .result-card.status-warning { border-left: 5px solid var(--warning-yellow); }
-        .result-card.status-pending { border-left: 5px solid var(--error-red); }
-        .result-card h3 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 10px; }
-        .result-card.status-success h3 { color: var(--primary-green); }
-        .result-card.status-warning h3 { color: var(--warning-yellow); }
-        .result-card.status-pending h3 { color: var(--error-red); }
-
-        .row-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; }
-        .row-item .label { font-weight: 600; color: var(--text-dark); opacity: 0.8; flex-basis: 40%; }
-        .row-item .value { color: var(--text-dark); flex-basis: 60%; text-align: right; word-break: break-word; }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.9em; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .status-badge.success { background-color: var(--primary-green); }
-        .status-badge.warning { background-color: var(--warning-yellow); color: #fff; }
-        .status-badge.pending { background-color: var(--error-red); }
-
-        @media (max-width: 900px) { .result-columns { flex-direction: column; } .container { padding: 1.5rem; } .top-bar { justify-content: center; height: auto; padding: 10px; flex-wrap: wrap; } body { padding-top: 100px; } }
+        #status-mini { font-size: 13px; font-weight: bold; color: #333; }
+        
+        @media(max-width: 800px) { .result-cols { flex-direction: column; } .top-bar { justify-content: center; flex-wrap: wrap; height: auto; padding: 10px; } }
     </style>
 </head>
 <body>
 
     <div id="top-bar" class="top-bar hidden">
-        <span id="upload-status-mini"></span>
+        <span id="status-mini"></span>
         
-        <input type="file" id="file-chv" style="display:none" accept=".xlsx, .xls, .csv" onchange="handleFileSelect('CHV')">
-        <input type="file" id="file-mrc" style="display:none" accept=".xlsx, .xls, .csv" onchange="handleFileSelect('MRC')">
-        
-        <button id="btn-up-chv" class="top-btn btn-up-chv hidden" onclick="document.getElementById('file-chv').click()">
-            ☁️ อัปโหลด Chevron
-        </button>
-        <button id="btn-up-mrc" class="top-btn btn-up-mrc hidden" onclick="document.getElementById('file-mrc').click()">
-            ☁️ อัปโหลด Miracle
-        </button>
-        
-        <a id="btn-sheet" href="#" target="_blank" class="top-btn btn-sheet hidden">
-            📊 ไปที่ Google Sheet
-        </a>
+        <input type="file" id="f-chv" hidden accept=".csv,.xlsx,.xls" onchange="uploadFile('CHV')">
+        <input type="file" id="f-mrc" hidden accept=".csv,.xlsx,.xls" onchange="uploadFile('MRC')">
 
-        <button class="top-btn btn-logout-mini" onclick="logout()">
-            🚪 ออกจากระบบ
-        </button>
+        <button id="btn-chv" class="top-btn btn-chv hidden" onclick="document.getElementById('f-chv').click()">☁️ อัปโหลด Chevron</button>
+        <button id="btn-mrc" class="top-btn btn-mrc hidden" onclick="document.getElementById('f-mrc').click()">☁️ อัปโหลด Miracle</button>
+        <a id="btn-sheet" href="#" target="_blank" class="top-btn btn-sheet hidden">📊 ไปที่ Google Sheet</a>
+        
+        <button class="top-btn btn-logout" onclick="location.reload()">🚪 ออกจากระบบ</button>
     </div>
 
     <div class="container">
-        <div id="login-section">
+        <div id="login-box">
             <h2>เข้าสู่ระบบคลังน้ำมัน</h2>
-            <p id="lock-status" class="hidden">ระบบถูกระงับชั่วคราว <span id="timer-display" style="font-weight:bold; color:red;"></span></p>
-            <input type="password" id="access-code" placeholder="กรอกรหัสผ่านเข้าใช้งาน">
-            <button id="btn-login" class="btn-main" onclick="checkLogin()">เข้าสู่ระบบ</button>
-            <p id="error-msg" style="color:red; margin-top:15px;"></p>
+            <input type="password" id="code" placeholder="รหัสผ่าน">
+            <button class="btn-main" onclick="doLogin()">เข้าสู่ระบบ</button>
+            <p id="msg" style="color:red; margin-top:10px;"></p>
         </div>
 
-        <div id="search-section" class="hidden">
+        <div id="app-box" class="hidden">
             <h2>ค้นหาข้อมูล PO</h2>
-            <p class="hint-text">ระบุได้หลาย PO (คั่นด้วยการขึ้นบรรทัดใหม่)</p>
-            <textarea id="po-input" placeholder="ตัวอย่าง:&#10;4900142335&#10;4900142336"></textarea>
-            
-            <button class="btn-main" onclick="searchPO()">ค้นหาข้อมูล</button>
-            
-            <div id="result-area" style="margin-top: 30px;"></div>
-            <button id="btn-export" class="btn-excel hidden" onclick="exportToExcel()">📥 ดาวน์โหลดไฟล์ Excel</button>
+            <textarea id="po" placeholder="ระบุเลข PO (แยกบรรทัด)"></textarea>
+            <button class="btn-main" onclick="doSearch()">ค้นหา</button>
+            <div id="result"></div>
+            <button id="btn-dl" class="btn-excel hidden" onclick="dlExcel()">📥 ดาวน์โหลด Excel</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // ⚠️⚠️⚠️ ตั้งค่า URL ตรงนี้ ⚠️⚠️⚠️
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9-4ItmQKNdERfnUX1J3BDmQPYgFouEHdmA0GKm8aZz5fWOTv5WQwGPP1KdG2_mDbEaw/exec'; // ใส่ URL ของ Web App
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1n5Nrr9Rf0-WQu2YIwc-0iFiaJENGZIVp_VzyaUt6-7c/edit?gid=1556244629#gid=1556244629'; // 🟢 ใส่ลิงก์ Google Sheet ของคุณตรงนี้
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxAwYe-jaOmWFtwzWNAFkjH4kGjOyB95tSIu8eY98i_9lmj18O4govpQdsFULy9QC8fYw/exec'; // 🟢 ใส่ URL Apps Script
+        const SHEET_LINK = 'https://docs.google.com/spreadsheets/d/1n5Nrr9Rf0-WQu2YIwc-0iFiaJENGZIVp_VzyaUt6-7c/edit?gid=2143202623#gid=2143202623'; // 🟢 ใส่ลิงก์ Google Sheet
         // ==========================================
 
-        document.getElementById('btn-sheet').href = SHEET_URL;
+        document.getElementById('btn-sheet').href = SHEET_LINK;
+        let exportData = [], exportHead = [];
 
-        let attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
-        let lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
-        let countdownInterval;
-        let currentExportData = [];
-        let currentExportHeaders = [];
-
-        checkLockout();
-
-        // --- Upload Functions ---
-        function handleFileSelect(type) {
-            const fileInput = document.getElementById(type === 'CHV' ? 'file-chv' : 'file-mrc');
-            const file = fileInput.files[0];
-            const statusMini = document.getElementById('upload-status-mini');
-            if (!file) return;
-
-            const targetName = type === 'CHV' ? 'Chevron' : 'Miracle';
-            if (!confirm(`ยืนยันการอัปโหลดไฟล์ "${file.name}" \nเพื่อเขียนทับข้อมูล "${targetName}" ทั้งหมด?`)) { fileInput.value = ''; return; }
-
-            statusMini.innerText = `⏳ กำลังอ่าน ${file.name}...`; statusMini.style.color = 'blue';
-            const reader = new FileReader();
-            const fileExt = file.name.split('.').pop().toLowerCase();
-
-            if (fileExt === 'csv') {
-                reader.readAsText(file);
-                reader.onload = e => uploadData(type, e.target.result, statusMini, fileInput);
-            } else if (['xlsx', 'xls'].includes(fileExt)) {
-                reader.readAsArrayBuffer(file);
-                reader.onload = e => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const csvData = XLSX.utils.sheet_to_csv(firstSheet);
-                        uploadData(type, csvData, statusMini, fileInput);
-                    } catch (err) {
-                        statusMini.innerText = "❌ Error อ่านไฟล์"; statusMini.style.color = 'red'; console.error(err); alert("อ่านไฟล์ Excel ไม่สำเร็จ");
-                    }
-                };
-            } else { alert("ไฟล์ไม่ถูกต้อง"); fileInput.value = ''; }
-        }
-
-        async function uploadData(type, csvContent, statusMini, fileInput) {
-            statusMini.innerText = `🚀 กำลังส่งข้อมูล...`;
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ type: type, csvData: csvContent })
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    statusMini.innerText = `✅ อัปเดต ${type} สำเร็จ!`; statusMini.style.color = 'green';
-                    setTimeout(() => { statusMini.innerText = ""; }, 5000); alert(`อัปเดตข้อมูล ${type} เรียบร้อยแล้ว`);
-                } else { throw new Error(result.message); }
-            } catch (error) { console.error(error); statusMini.innerText = `❌ Error`; statusMini.style.color = 'red'; alert(`เกิดข้อผิดพลาด: ${error.message}`); } 
-            finally { fileInput.value = ''; }
-        }
-
-        // --- Login Logic (Check Role) ---
-        async function checkLogin() {
-            const code = document.getElementById('access-code').value.trim();
+        // --- Login ---
+        async function doLogin() {
+            const code = document.getElementById('code').value.trim();
+            const btn = document.querySelector('#login-box button');
             if(!code) return;
-            document.getElementById('btn-login').innerText = "ตรวจสอบ..."; document.getElementById('btn-login').disabled = true;
+            
+            btn.disabled = true; btn.innerText = "กำลังตรวจสอบ...";
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}`);
+                const res = await fetch(`${API_URL}?action=login&code=${encodeURIComponent(code)}`);
+                const json = await res.json(); // อ่าน JSON ตรงๆ
+
+                if (json.status === 'success') {
+                    // *** จุดสำคัญที่แก้: อ่าน role ตรงๆ จาก json ***
+                    const role = json.role || "user"; 
+                    
+                    document.getElementById('login-box').classList.add('hidden');
+                    document.getElementById('app-box').classList.remove('hidden');
+                    document.getElementById('top-bar').classList.remove('hidden');
+
+                    // ถ้าเป็น Admin ให้โชว์ปุ่ม
+                    if (role === 'admin') {
+                        document.getElementById('btn-chv').classList.remove('hidden');
+                        document.getElementById('btn-mrc').classList.remove('hidden');
+                        document.getElementById('btn-sheet').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('msg').innerText = "รหัสผิด";
+                }
+            } catch(e) {
+                document.getElementById('msg').innerText = "เชื่อมต่อไม่ได้";
+            } finally {
+                btn.disabled = false; btn.innerText = "เข้าสู่ระบบ";
+            }
+        }
+
+        // --- Upload ---
+        function uploadFile(type) {
+            const file = document.getElementById(type==='CHV'?'f-chv':'f-mrc').files[0];
+            if(!file) return;
+            if(!confirm(`ยืนยันอัปโหลดทับข้อมูล ${type}?`)) return;
+
+            const reader = new FileReader();
+            const status = document.getElementById('status-mini');
+            status.innerText = `⏳ กำลังอ่านไฟล์...`; status.style.color="blue";
+
+            reader.onload = async (e) => {
+                let csv = "";
+                if(file.name.endsWith('.csv')) csv = e.target.result;
+                else {
+                    const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+                    csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+                }
+                
+                status.innerText = `🚀 กำลังส่ง...`;
+                try {
+                    const res = await fetch(API_URL, {
+                        method:'POST', redirect:'follow',
+                        headers:{'Content-Type':'text/plain;charset=utf-8'},
+                        body: JSON.stringify({type:type, csvData:csv})
+                    });
+                    const json = await res.json();
+                    if(json.status==='success') {
+                        status.innerText = "✅ เสร็จสิ้น"; status.style.color="green";
+                        alert("อัปเดตเรียบร้อย");
+                    } else throw new Error(json.message);
+                } catch(err) {
+                    status.innerText = "❌ ผิดพลาด"; status.style.color="red";
+                    alert(err.message);
+                }
+            };
+            
+            if(file.name.endsWith('.csv')) reader.readAsText(file);
+            else reader.readAsArrayBuffer(file);
+        }
+
+        // --- Search ---
+        async function doSearch() {
+            const po = document.getElementById('po').value;
+            if(!po) return;
+            document.getElementById('result').innerHTML = "กำลังค้นหา...";
+            
+            try {
+                const res = await fetch(`${API_URL}?action=search&po=${encodeURIComponent(po)}`);
                 const json = await res.json();
                 
                 if(json.status === 'success') {
-                    attempts = 0; localStorage.setItem('login_attempts', 0); localStorage.removeItem('lock_until');
-                    
-                    document.getElementById('login-section').classList.add('hidden'); 
-                    document.getElementById('search-section').classList.remove('hidden');
-                    document.getElementById('top-bar').classList.remove('hidden');
-
-                    // --- เช็คสิทธิ์ (Role) ---
-                    let userData = {};
-                    try { userData = JSON.parse(json.message); } catch(e) { console.log("Legacy response"); }
-                    const role = userData.role || "user";
-                    
-                    // ถ้าเป็น Admin ให้โชว์ปุ่มอัปโหลด และปุ่ม Sheet
-                    if (role === 'admin') {
-                        document.getElementById('btn-up-chv').classList.remove('hidden');
-                        document.getElementById('btn-up-mrc').classList.remove('hidden');
-                        document.getElementById('btn-sheet').classList.remove('hidden'); // โชว์ปุ่ม Sheet
-                    }
+                    exportData = json.data; exportHead = json.headers;
+                    document.getElementById('btn-dl').classList.remove('hidden');
+                    render(json.data, json.headers);
                 } else {
-                    attempts++; localStorage.setItem('login_attempts', attempts);
-                    if(attempts >= 10) { lockUntil = new Date().getTime() + 3600000; localStorage.setItem('lock_until', lockUntil); checkLockout(); }
-                    else if(attempts >= 3) { lockUntil = new Date().getTime() + 1200000; localStorage.setItem('lock_until', lockUntil); checkLockout(); }
-                    else { document.getElementById('error-msg').innerText = `รหัสผิด (ครั้งที่ ${attempts})`; }
+                    document.getElementById('result').innerHTML = "<p style='color:red'>ไม่พบข้อมูล</p>";
                 }
-            } catch(e) { document.getElementById('error-msg').innerText = "เชื่อมต่อไม่ได้"; console.error(e); }
-            finally { document.getElementById('btn-login').innerText = "เข้าสู่ระบบ"; if(new Date().getTime() >= lockUntil) document.getElementById('btn-login').disabled = false; }
+            } catch(e) { document.getElementById('result').innerText = "Error"; }
         }
 
-        // --- Search Logic ---
-        function checkLockout() { const now = new Date().getTime(); if (now < lockUntil) disableLogin(lockUntil - now); else enableLogin(); }
-        function disableLogin(time) { 
-            document.getElementById('access-code').disabled = true; document.getElementById('btn-login').disabled = true; 
-            document.getElementById('lock-status').classList.remove('hidden'); 
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                const now = new Date().getTime(); const diff = lockUntil - now;
-                if (diff <= 0) { clearInterval(countdownInterval); enableLogin(); }
-                else { 
-                    const m = Math.floor((diff % (1000*60*60))/(1000*60)); const s = Math.floor((diff % (1000*60))/1000);
-                    document.getElementById('timer-display').innerText = `รอ ${m} นาที ${s} วินาที`;
-                }
-            }, 1000);
-        }
-        function enableLogin() { 
-            localStorage.removeItem('lock_until'); document.getElementById('access-code').disabled = false;
-            document.getElementById('btn-login').disabled = false; document.getElementById('lock-status').classList.add('hidden');
-        }
-        async function searchPO() {
-            const po = document.getElementById('po-input').value.trim();
-            if(!po) { alert("ใส่เลข PO ก่อนครับ"); return; }
-            document.getElementById('result-area').innerHTML = "<p style='color:green'>กำลังค้นหา...</p>";
-            document.getElementById('btn-export').classList.add('hidden');
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=search&po=${encodeURIComponent(po)}`);
-                const json = await res.json();
-                
-                let searchData = json;
-                if(json.message && typeof json.message === 'string' && json.message.startsWith('{')) { searchData = JSON.parse(json.message); }
+        function render(data, heads) {
+            let htmlS="", htmlW="", htmlE="", cS=0, cW=0, cE=0;
+            data.forEach(r => {
+                let txt = r.join(" ");
+                let type = "success";
+                if(txt.includes("ไม่สำเร็จ")||txt.includes("ยังไม่")||txt.includes("ไม่ยืนยัน")||txt.includes("ส่งไม่ได้")) type="error";
+                else if(txt.includes("ขนย้าย")||txt.includes("ระหว่างส่ง")) type="warning";
 
-                if(searchData.status === 'success' && searchData.data.length > 0) {
-                    currentExportData = searchData.data; currentExportHeaders = searchData.headers;
-                    document.getElementById('btn-export').classList.remove('hidden');
-                    renderResults(searchData.data, searchData.headers);
-                } else { document.getElementById('result-area').innerHTML = "<p style='color:red'>ไม่พบข้อมูล</p>"; }
-            } catch(e) { document.getElementById('result-area').innerHTML = "<p style='color:red'>เกิดข้อผิดพลาด</p>"; console.error(e); }
-        }
-        function renderResults(data, headers) {
-            let success="", warning="", pending="";
-            let cS=0, cW=0, cP=0;
-            data.forEach(row => {
-                let txt = row.join(" "); let type="success";
-                if(txt.includes("ไม่สำเร็จ") || txt.includes("ยังไม่") || txt.includes("ไม่ยืนยัน") || txt.includes("ส่งไม่ได้")) type="pending";
-                else if(txt.includes("ขนย้าย") || txt.includes("ระหว่างส่ง")) type="warning";
-                
-                let html = `<div class='result-card status-${type}'><h3>PO: ${row[0]}</h3>`;
-                row.forEach((item, i) => {
-                    let hName = (headers && headers[i]) ? headers[i] : `Col ${i+1}`;
-                    let val = item; let itemStr = item.toString(); let badge=null;
-                    if(itemStr.includes("ไม่สำเร็จ")||itemStr.includes("ยังไม่")||itemStr.includes("ไม่ยืนยัน")||itemStr.includes("ส่งไม่ได้")) badge="pending";
-                    else if(itemStr.includes("ขนย้าย")||itemStr.includes("ระหว่างส่ง")) badge="warning";
-                    else if(itemStr.includes("จัดส่งสำเร็จ")||itemStr.includes("จัดส่งเสร็จ")) badge="success";
-                    if(badge) val = `<span class='status-badge ${badge}'>${item}</span>`;
-                    html += `<div class='row-item'><span class='label'>${hName}:</span><span class='value'>${val}</span></div>`;
+                let card = `<div class='card ${type}'><h3>PO: ${r[0]}</h3>`;
+                r.forEach((v,i) => {
+                    let val = v;
+                    if(String(v).includes("สำเร็จ")) val = `<span class='badge s'>${v}</span>`;
+                    if(String(v).includes("ระหว่าง")) val = `<span class='badge w'>${v}</span>`;
+                    if(String(v).includes("ไม่")) val = `<span class='badge e'>${v}</span>`;
+                    card += `<div class='row'><span class='label'>${heads[i]||'Col'+i}:</span><span>${val}</span></div>`;
                 });
-                html += `</div>`;
-                if(type==="pending") { pending+=html; cP++; } else if(type==="warning") { warning+=html; cW++; } else { success+=html; cS++; }
+                card += "</div>";
+
+                if(type==="success") { htmlS+=card; cS++; }
+                else if(type==="warning") { htmlW+=card; cW++; }
+                else { htmlE+=card; cE++; }
             });
-            document.getElementById('result-area').innerHTML = `
-                <div class="result-columns">
-                    <div class="col-item"><div class="col-header header-success">✅ สำเร็จ (${cS})</div>${success||"-"}</div>
-                    <div class="col-item"><div class="col-header header-warning">🚚 ระหว่างส่ง (${cW})</div>${warning||"-"}</div>
-                    <div class="col-item"><div class="col-header header-pending">❌ ไม่สำเร็จ (${cP})</div>${pending||"-"}</div>
+
+            document.getElementById('result').innerHTML = `
+                <div class='result-cols'>
+                    <div class='col'><div class='col-head bg-success'>✅ สำเร็จ (${cS})</div>${htmlS}</div>
+                    <div class='col'><div class='col-head bg-warning'>🚚 ระหว่างส่ง (${cW})</div>${htmlW}</div>
+                    <div class='col'><div class='col-head bg-error'>❌ ไม่สำเร็จ (${cE})</div>${htmlE}</div>
                 </div>`;
         }
-        function exportToExcel() {
-            if(currentExportData.length===0) return;
-            let csv = ""; if(currentExportHeaders.length) csv += currentExportHeaders.map(h=>`"${h}"`).join(",")+ "\n";
-            currentExportData.forEach(r => csv += r.map(c=>`"${(c||"").toString().replace(/"/g,'""')}"`).join(",")+"\n");
-            const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `PO_Export.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+
+        function dlExcel() {
+            if(!exportData.length) return;
+            let csv = "\uFEFF" + exportHead.map(h=>`"${h}"`).join(",") + "\n";
+            exportData.forEach(r => csv += r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")+"\n");
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+            a.download = "PO_Data.csv"; a.click();
         }
-        function logout() { location.reload(); }
     </script>
 </body>
 </html>
