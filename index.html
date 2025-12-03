@@ -17,31 +17,101 @@
             --warning-yellow: #f9a825; --bg-yellow-light: #fffde7;
             --bg-mint: #e8f5e9; --text-dark: #37474f; --text-light: #78909c;
             --white: #ffffff; --excel-orange: #f57c00;
-            --upload-blue: #1565c0; --upload-purple: #6a1b9a;
+            --btn-blue: #1565c0; --btn-purple: #6a1b9a;
         }
 
-        body { font-family: 'Sarabun', sans-serif; background-color: var(--bg-mint); color: var(--text-dark); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 40px 20px; box-sizing: border-box; }
-        .container { background: var(--white); padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1); width: 100%; max-width: 1200px; text-align: center; }
-        h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
-        h3 { font-size: 1.1rem; margin-top: 20px; color: var(--text-dark); border-top: 1px solid #eee; padding-top: 20px; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-mint);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* เริ่มจากด้านบน */
+            min-height: 100vh;
+            margin: 0;
+            padding: 80px 20px 40px 20px; /* เพิ่ม padding ด้านบนกันเมนูบัง */
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(46, 125, 50, 0.1);
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        /* --- Top Bar Styling (แถบเมนูขวาบน) --- */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: flex-end; /* ชิดขวา */
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.95); /* พื้นหลังโปร่งแสงนิดๆ */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        /* ปุ่มใน Top Bar จะเล็กกว่าปกติ */
+        .top-btn {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 20px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+        .top-btn:hover { transform: translateY(-2px); filter: brightness(110%); }
         
-        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #cfd8dc; border-radius: 10px; box-sizing: border-box; font-family: 'Sarabun', sans-serif; font-size: 16px; }
+        .btn-up-chv { background-color: var(--btn-blue); }
+        .btn-up-mrc { background-color: var(--btn-purple); }
+        .btn-logout-mini { background-color: #eee; color: var(--text-dark); border: 1px solid #ddd; }
+        .btn-logout-mini:hover { background-color: #ddd; }
+
+        /* Status Text ใน Top Bar */
+        #upload-status-mini {
+            font-size: 13px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        h2 { color: var(--primary-green); font-weight: 600; margin-bottom: 1.5rem; }
+
+        input, textarea {
+            width: 100%; padding: 14px; margin: 10px 0;
+            border: 2px solid #cfd8dc; border-radius: 10px;
+            box-sizing: border-box; font-family: 'Sarabun', sans-serif; font-size: 16px;
+        }
         textarea { resize: vertical; min-height: 100px; }
         input:focus, textarea:focus { outline: none; border-color: var(--primary-green); }
 
-        button { width: 100%; padding: 14px; background-color: var(--primary-green); color: var(--white); border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: 600; margin-top: 10px; transition: all 0.3s; }
-        button:hover { filter: brightness(90%); }
-        button:disabled { background-color: var(--text-light); cursor: not-allowed; }
+        /* ปุ่มค้นหา (ใหญ่) */
+        .btn-main {
+            width: 100%; padding: 14px; background-color: var(--primary-green);
+            color: var(--white); border: none; border-radius: 10px; cursor: pointer;
+            font-size: 18px; font-weight: 600; margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .btn-main:hover { filter: brightness(90%); }
+        .btn-main:disabled { background-color: var(--text-light); cursor: not-allowed; }
 
-        .btn-excel { background-color: var(--excel-orange); margin-bottom: 20px; }
-        .btn-logout { background-color: var(--white); color: var(--text-light); border: 2px solid #cfd8dc; margin-top: 20px; }
+        .btn-excel { background-color: var(--excel-orange); margin-bottom: 20px; width: 100%; padding: 14px; border:none; border-radius:10px; color:white; font-size:16px; cursor:pointer; font-weight:600;}
         
-        /* Upload Section */
-        .upload-section { margin-top: 30px; padding: 20px; background-color: #f5f5f5; border-radius: 10px; }
-        .btn-upload-chv { background-color: var(--upload-blue); }
-        .btn-upload-mrc { background-color: var(--upload-purple); }
-        .file-input { display: none; } 
-        .hidden { display: none; }
+        .hidden { display: none !important; } /* บังคับซ่อน */
         .timer { font-weight: bold; color: var(--error-red); }
         #error-msg { color: var(--error-red); margin-top: 15px; }
         .hint-text { font-size: 0.85em; color: var(--text-light); text-align: left; margin-bottom: 10px; }
@@ -74,17 +144,40 @@
         .status-badge.warning { background-color: var(--warning-yellow); color: #fff; }
         .status-badge.pending { background-color: var(--error-red); }
 
-        @media (max-width: 900px) { .result-columns { flex-direction: column; } .container { padding: 1.5rem; } }
+        @media (max-width: 900px) {
+            .result-columns { flex-direction: column; }
+            .container { padding: 1.5rem; }
+            .top-bar { justify-content: center; height: auto; padding: 10px; flex-wrap: wrap; }
+            body { padding-top: 100px; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="top-bar" class="top-bar hidden">
+        <span id="upload-status-mini"></span>
+        
+        <input type="file" id="file-chv" style="display:none" accept=".xlsx, .xls, .csv" onchange="handleFileSelect('CHV')">
+        <input type="file" id="file-mrc" style="display:none" accept=".xlsx, .xls, .csv" onchange="handleFileSelect('MRC')">
+        
+        <button class="top-btn btn-up-chv" onclick="document.getElementById('file-chv').click()">
+            ☁️ อัปโหลด Chevron
+        </button>
+        <button class="top-btn btn-up-mrc" onclick="document.getElementById('file-mrc').click()">
+            ☁️ อัปโหลด Miracle
+        </button>
+        <button class="top-btn btn-logout-mini" onclick="logout()">
+            🚪 ออกจากระบบ
+        </button>
+    </div>
+
     <div class="container">
         <div id="login-section">
             <h2>เข้าสู่ระบบคลังน้ำมัน</h2>
-            <p id="lock-status" class="hidden">ระบบถูกระงับชั่วคราว <span id="timer-display" class="timer"></span></p>
+            <p id="lock-status" class="hidden">ระบบถูกระงับชั่วคราว <span id="timer-display" style="font-weight:bold; color:red;"></span></p>
             <input type="password" id="access-code" placeholder="กรอกรหัสผ่านเข้าใช้งาน">
-            <button id="btn-login" onclick="checkLogin()">เข้าสู่ระบบ</button>
-            <p id="error-msg"></p>
+            <button id="btn-login" class="btn-main" onclick="checkLogin()">เข้าสู่ระบบ</button>
+            <p id="error-msg" style="color:red; margin-top:15px;"></p>
         </div>
 
         <div id="search-section" class="hidden">
@@ -92,31 +185,18 @@
             <p class="hint-text">ระบุได้หลาย PO (คั่นด้วยการขึ้นบรรทัดใหม่)</p>
             <textarea id="po-input" placeholder="ตัวอย่าง:&#10;4900142335&#10;4900142336"></textarea>
             
-            <button onclick="searchPO()">ค้นหาข้อมูล</button>
+            <button class="btn-main" onclick="searchPO()">ค้นหาข้อมูล</button>
+            
             <div id="result-area" style="margin-top: 30px;"></div>
             <button id="btn-export" class="btn-excel hidden" onclick="exportToExcel()">📥 ดาวน์โหลดไฟล์ Excel</button>
-
-            <div class="upload-section">
-                <h3>🛠️ อัปเดตข้อมูล (รองรับไฟล์ .xlsx และ .csv)</h3>
-                
-                <input type="file" id="file-chv" class="file-input" accept=".csv, .xlsx, .xls" onchange="processFile('CHV')">
-                <button class="btn-upload-chv" onclick="document.getElementById('file-chv').click()">⬆️ อัปโหลดไฟล์ Chevron</button>
-
-                <input type="file" id="file-mrc" class="file-input" accept=".csv, .xlsx, .xls" onchange="processFile('MRC')">
-                <button class="btn-upload-mrc" onclick="document.getElementById('file-mrc').click()">⬆️ อัปโหลดไฟล์ Miracle</button>
-                
-                <p id="upload-status" style="margin-top:10px; font-weight:bold;"></p>
-            </div>
-            
-            <button class="btn-logout" onclick="logout()">ออกจากระบบ</button>
         </div>
     </div>
 
     <script>
-        // ====================================================
-        // ⚠️⚠️⚠️ วาง URL ใหม่ที่นี่ ⚠️⚠️⚠️
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwf2T0uU0RM5FxeMWH2NGLTkpuqEyZA5vlrq6J1ohk8edlmW5aywr6Fjhs6g8ZJJlaZXw/exec'; 
-        // ====================================================
+        // ==========================================
+        // ⚠️⚠️⚠️ วาง URL ใหม่ตรงนี้ ⚠️⚠️⚠️
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwf2T0uU0RM5FxeMWH2NGLTkpuqEyZA5vlrq6J1ohk8edlmW5aywr6Fjhs6g8ZJJlaZXw/exec';
+        // ==========================================
 
         let attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
         let lockUntil = parseInt(localStorage.getItem('lock_until')) || 0;
@@ -126,156 +206,174 @@
 
         checkLockout();
 
-        // --- Upload Logic (Fixed for CORS) ---
-        function processFile(type) {
+        // --- Upload Functions ---
+        function handleFileSelect(type) {
             const fileInput = document.getElementById(type === 'CHV' ? 'file-chv' : 'file-mrc');
             const file = fileInput.files[0];
-            const statusText = document.getElementById('upload-status');
+            const statusMini = document.getElementById('upload-status-mini');
+
             if (!file) return;
 
-            const validExts = ['.csv', '.xlsx', '.xls'];
-            const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            if (!validExts.includes(fileExt)) { alert('กรุณาอัปโหลดไฟล์ Excel (.xlsx, .xls) หรือ CSV เท่านั้น'); fileInput.value = ''; return; }
-            if (!confirm(`ยืนยันการอัปโหลดไฟล์ ${file.name} ทับข้อมูล ${type === 'CHV' ? 'Chevron' : 'Miracle'} ทั้งหมด?`)) { fileInput.value = ''; return; }
+            const targetName = type === 'CHV' ? 'Chevron' : 'Miracle';
+            if (!confirm(`ยืนยันการอัปโหลดไฟล์ "${file.name}" \nเพื่อเขียนทับข้อมูล "${targetName}" ทั้งหมด?`)) {
+                fileInput.value = ''; return;
+            }
 
-            statusText.innerText = `กำลังอ่านไฟล์ ${type}...`;
-            statusText.style.color = "blue";
+            statusMini.innerText = `⏳ กำลังอ่าน ${file.name}...`;
+            statusMini.style.color = 'blue';
+
             const reader = new FileReader();
+            const fileExt = file.name.split('.').pop().toLowerCase();
 
-            if (fileExt === '.csv') {
+            if (fileExt === 'csv') {
                 reader.readAsText(file);
-                reader.onload = function(e) { uploadData(type, e.target.result, statusText, fileInput); };
-            } else {
+                reader.onload = e => uploadData(type, e.target.result, statusMini, fileInput);
+            } else if (['xlsx', 'xls'].includes(fileExt)) {
                 reader.readAsArrayBuffer(file);
-                reader.onload = function(e) {
+                reader.onload = e => {
                     try {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, {type: 'array'});
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const csvContent = XLSX.utils.sheet_to_csv(worksheet);
-                        uploadData(type, csvContent, statusText, fileInput);
-                    } catch (error) {
-                        console.error(error);
-                        statusText.innerText = "❌ อ่านไฟล์ Excel ไม่สำเร็จ"; statusText.style.color = "red"; fileInput.value = '';
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const csvData = XLSX.utils.sheet_to_csv(firstSheet);
+                        uploadData(type, csvData, statusMini, fileInput);
+                    } catch (err) {
+                        statusMini.innerText = "❌ Error อ่านไฟล์"; statusMini.style.color = 'red';
+                        console.error(err);
+                        alert("อ่านไฟล์ Excel ไม่สำเร็จ");
                     }
                 };
+            } else {
+                alert("ไฟล์ไม่ถูกต้อง"); fileInput.value = '';
             }
         }
 
-        async function uploadData(type, csvContent, statusText, fileInput) {
-            statusText.innerText = `กำลังส่งข้อมูล ${type} ขึ้นระบบ...`;
+        async function uploadData(type, csvContent, statusMini, fileInput) {
+            statusMini.innerText = `🚀 กำลังส่งข้อมูล...`;
+            
             try {
-                // *** FIX: ส่ง text/plain เพื่อเลี่ยง CORS ***
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     redirect: 'follow',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ type: type, csvData: csvContent })
                 });
+
                 const result = await response.json();
+
                 if (result.status === 'success') {
-                    statusText.innerText = `✅ ${result.message}`; statusText.style.color = "green"; alert("อัปเดตข้อมูลสำเร็จ!");
-                } else { throw new Error(result.message); }
+                    statusMini.innerText = `✅ อัปเดต ${type} สำเร็จ!`;
+                    statusMini.style.color = 'green';
+                    setTimeout(() => { statusMini.innerText = ""; }, 5000); // ลบข้อความหลัง 5 วิ
+                    alert(`อัปเดตข้อมูล ${type} เรียบร้อยแล้ว`);
+                } else {
+                    throw new Error(result.message);
+                }
             } catch (error) {
                 console.error(error);
-                statusText.innerText = `❌ เกิดข้อผิดพลาด: ${error.message}`; statusText.style.color = "red";
-            } finally { fileInput.value = ''; }
+                statusMini.innerText = `❌ Error`;
+                statusMini.style.color = 'red';
+                alert(`เกิดข้อผิดพลาด: ${error.message}`);
+            } finally {
+                fileInput.value = '';
+            }
         }
 
-        // --- Main Logic ---
-        function checkLockout() { const now = new Date().getTime(); if (now < lockUntil) { disableLogin(lockUntil - now); } else { enableLogin(); } }
-        function disableLogin(remainingTime) {
-            document.getElementById('access-code').disabled = true; document.getElementById('btn-login').disabled = true;
-            document.getElementById('lock-status').classList.remove('hidden'); document.getElementById('error-msg').innerText = "";
+        // --- Login Logic ---
+        function checkLockout() { const now = new Date().getTime(); if (now < lockUntil) disableLogin(lockUntil - now); else enableLogin(); }
+        function disableLogin(time) { 
+            document.getElementById('access-code').disabled = true; document.getElementById('btn-login').disabled = true; 
+            document.getElementById('lock-status').classList.remove('hidden'); 
             clearInterval(countdownInterval);
             countdownInterval = setInterval(() => {
                 const now = new Date().getTime(); const diff = lockUntil - now;
                 if (diff <= 0) { clearInterval(countdownInterval); enableLogin(); }
-                else {
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    document.getElementById('timer-display').innerText = `รอ ${minutes} นาที ${seconds} วินาที`;
+                else { 
+                    const m = Math.floor((diff % (1000*60*60))/(1000*60)); const s = Math.floor((diff % (1000*60))/1000);
+                    document.getElementById('timer-display').innerText = `รอ ${m} นาที ${s} วินาที`;
                 }
             }, 1000);
         }
-        function enableLogin() {
+        function enableLogin() { 
             localStorage.removeItem('lock_until'); document.getElementById('access-code').disabled = false;
             document.getElementById('btn-login').disabled = false; document.getElementById('lock-status').classList.add('hidden');
-            document.getElementById('timer-display').innerText = "";
         }
         async function checkLogin() {
-            const codeInput = document.getElementById('access-code'); const code = codeInput.value.trim();
-            const btn = document.getElementById('btn-login'); const errorMsg = document.getElementById('error-msg');
-            if (!code) { errorMsg.innerText = "กรุณากรอกรหัสผ่าน"; return; }
-            btn.innerText = "กำลังตรวจสอบ..."; btn.disabled = true; errorMsg.innerText = "";
+            const code = document.getElementById('access-code').value.trim();
+            if(!code) return;
+            document.getElementById('btn-login').innerText = "ตรวจสอบ..."; document.getElementById('btn-login').disabled = true;
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}`);
-                const result = await response.json();
-                if (result.status === 'success') {
+                const res = await fetch(`${SCRIPT_URL}?action=login&code=${encodeURIComponent(code)}`);
+                const json = await res.json();
+                if(json.status === 'success') {
                     attempts = 0; localStorage.setItem('login_attempts', 0); localStorage.removeItem('lock_until');
-                    document.getElementById('login-section').classList.add('hidden'); document.getElementById('search-section').classList.remove('hidden'); codeInput.value = "";
-                } else { handleFailedLogin(); }
-            } catch (error) { errorMsg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ"; } 
-            finally { btn.innerText = "เข้าสู่ระบบ"; if (new Date().getTime() >= lockUntil) { btn.disabled = false; } }
+                    
+                    // Show Main UI & Top Bar
+                    document.getElementById('login-section').classList.add('hidden'); 
+                    document.getElementById('search-section').classList.remove('hidden');
+                    document.getElementById('top-bar').classList.remove('hidden'); // โชว์แถบบน
+                } else {
+                    attempts++; localStorage.setItem('login_attempts', attempts);
+                    if(attempts >= 10) { lockUntil = new Date().getTime() + 3600000; localStorage.setItem('lock_until', lockUntil); checkLockout(); }
+                    else if(attempts >= 3) { lockUntil = new Date().getTime() + 1200000; localStorage.setItem('lock_until', lockUntil); checkLockout(); }
+                    else { document.getElementById('error-msg').innerText = `รหัสผิด (ครั้งที่ ${attempts})`; }
+                }
+            } catch(e) { document.getElementById('error-msg').innerText = "เชื่อมต่อไม่ได้"; }
+            finally { document.getElementById('btn-login').innerText = "เข้าสู่ระบบ"; if(new Date().getTime() >= lockUntil) document.getElementById('btn-login').disabled = false; }
         }
-        function handleFailedLogin() {
-            attempts++; localStorage.setItem('login_attempts', attempts); let waitTime = 0;
-            if (attempts >= 10) waitTime = 60 * 60 * 1000; else if (attempts >= 3) waitTime = 20 * 60 * 1000;
-            if (waitTime > 0) {
-                lockUntil = new Date().getTime() + waitTime; localStorage.setItem('lock_until', lockUntil);
-                checkLockout(); alert(`ผิดครบ ${attempts} ครั้ง ระบบระงับการใช้งานชั่วคราว`);
-            } else { document.getElementById('error-msg').innerText = `รหัสผิด (ครั้งที่ ${attempts})`; }
-        }
+
+        // --- Search Logic ---
         async function searchPO() {
-            const poInput = document.getElementById('po-input'); const po = poInput.value.trim();
-            const resultArea = document.getElementById('result-area'); const btnExport = document.getElementById('btn-export');
-            if(!po) { alert("กรุณาระบุเลข PO"); return; }
-            resultArea.innerHTML = "<p style='text-align:center; color:var(--primary-green);'>กำลังค้นหาข้อมูล...</p>"; btnExport.classList.add('hidden');
+            const po = document.getElementById('po-input').value.trim();
+            if(!po) { alert("ใส่เลข PO ก่อนครับ"); return; }
+            document.getElementById('result-area').innerHTML = "<p style='color:green'>กำลังค้นหา...</p>";
+            document.getElementById('btn-export').classList.add('hidden');
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=search&po=${encodeURIComponent(po)}`);
-                const result = await response.json();
-                if (result.status === 'success' && result.data && result.data.length > 0) {
-                    currentExportData = result.data; currentExportHeaders = result.headers; btnExport.classList.remove('hidden');
-                    let successCards = ""; let warningCards = ""; let pendingCards = "";
-                    let successCount = 0; let warningCount = 0; let pendingCount = 0;
-                    const headers = result.headers;
-                    result.data.forEach((rowData, resultIndex) => {
-                        let rowString = rowData.join(" "); let statusType = "success";
-                        if (rowString.includes("ไม่สำเร็จ") || rowString.includes("ยังไม่") || rowString.includes("ไม่ยืนยัน") || rowString.includes("ส่งไม่ได้")) { statusType = "pending"; } 
-                        else if (rowString.includes("ขนย้าย") || rowString.includes("ระหว่างส่ง")) { statusType = "warning"; }
-                        else if (rowString.includes("จัดส่งสำเร็จ") || rowString.includes("จัดส่งเสร็จ")) { statusType = "success"; }
-                        
-                        let cardClass = `status-${statusType}`;
-                        let cardHtml = `<div class='result-card ${cardClass}'><h3>PO: ${rowData[0]}</h3>`;
-                        rowData.forEach((item, index) => {
-                            let headerName = (headers && headers[index]) ? headers[index] : `Col ${index+1}`;
-                            let displayValue = item; let itemStr = item.toString(); let badgeType = null;
-                            if (itemStr.includes("ไม่สำเร็จ") || itemStr.includes("ยังไม่") || itemStr.includes("ไม่ยืนยัน") || itemStr.includes("ส่งไม่ได้")) { badgeType = "pending"; } 
-                            else if (itemStr.includes("ขนย้าย") || itemStr.includes("ระหว่างส่ง")) { badgeType = "warning"; }
-                            else if (itemStr.includes("จัดส่งสำเร็จ") || itemStr.includes("จัดส่งเสร็จ")) { badgeType = "success"; }
-                            if (badgeType) { displayValue = `<span class='status-badge ${badgeType}'>${item}</span>`; }
-                            cardHtml += `<div class='row-item'><span class='label'>${headerName}:</span><span class='value'>${displayValue}</span></div>`;
-                        });
-                        cardHtml += `</div>`;
-                        if (statusType === "pending") { pendingCards += cardHtml; pendingCount++; } 
-                        else if (statusType === "warning") { warningCards += cardHtml; warningCount++; } 
-                        else { successCards += cardHtml; successCount++; }
-                    });
-                    let finalHtml = `<div class="result-columns">
-                        <div class="col-item"><div class="col-header header-success">✅ จัดส่งสำเร็จ (${successCount})</div>${successCards || "<p style='text-align:center; color:#ccc'>-</p>"}</div>
-                        <div class="col-item"><div class="col-header header-warning">🚚 ขนย้าย (${warningCount})</div>${warningCards || "<p style='text-align:center; color:#ccc'>-</p>"}</div>
-                        <div class="col-item"><div class="col-header header-pending">❌ ส่งไม่ได้/ไม่ยืนยัน (${pendingCount})</div>${pendingCards || "<p style='text-align:center; color:#ccc'>-</p>"}</div></div>`;
-                    resultArea.innerHTML = finalHtml;
-                } else { resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>ไม่พบข้อมูล PO นี้</p>"; btnExport.classList.add('hidden'); }
-            } catch (error) { console.error(error); resultArea.innerHTML = "<p style='color:var(--error-red); text-align:center;'>เกิดข้อผิดพลาด</p>"; btnExport.classList.add('hidden'); }
+                const res = await fetch(`${SCRIPT_URL}?action=search&po=${encodeURIComponent(po)}`);
+                const json = await res.json();
+                if(json.status === 'success' && json.data.length > 0) {
+                    currentExportData = json.data; currentExportHeaders = json.headers;
+                    document.getElementById('btn-export').classList.remove('hidden');
+                    renderResults(json.data, json.headers);
+                } else {
+                    document.getElementById('result-area').innerHTML = "<p style='color:red'>ไม่พบข้อมูล</p>";
+                }
+            } catch(e) { document.getElementById('result-area').innerHTML = "<p style='color:red'>เกิดข้อผิดพลาด</p>"; }
+        }
+        function renderResults(data, headers) {
+            let success="", warning="", pending="";
+            let cS=0, cW=0, cP=0;
+            data.forEach(row => {
+                let txt = row.join(" "); let type="success";
+                if(txt.includes("ไม่สำเร็จ") || txt.includes("ยังไม่") || txt.includes("ไม่ยืนยัน") || txt.includes("ส่งไม่ได้")) type="pending";
+                else if(txt.includes("ขนย้าย") || txt.includes("ระหว่างส่ง")) type="warning";
+                
+                let html = `<div class='result-card status-${type}'><h3>PO: ${row[0]}</h3>`;
+                row.forEach((item, i) => {
+                    let hName = (headers && headers[i]) ? headers[i] : `Col ${i+1}`;
+                    let val = item; let itemStr = item.toString(); let badge=null;
+                    if(itemStr.includes("ไม่สำเร็จ")||itemStr.includes("ยังไม่")||itemStr.includes("ไม่ยืนยัน")||itemStr.includes("ส่งไม่ได้")) badge="pending";
+                    else if(itemStr.includes("ขนย้าย")||itemStr.includes("ระหว่างส่ง")) badge="warning";
+                    else if(itemStr.includes("จัดส่งสำเร็จ")||itemStr.includes("จัดส่งเสร็จ")) badge="success";
+                    if(badge) val = `<span class='status-badge ${badge}'>${item}</span>`;
+                    html += `<div class='row-item'><span class='label'>${hName}:</span><span class='value'>${val}</span></div>`;
+                });
+                html += `</div>`;
+                if(type==="pending") { pending+=html; cP++; } else if(type==="warning") { warning+=html; cW++; } else { success+=html; cS++; }
+            });
+            document.getElementById('result-area').innerHTML = `
+                <div class="result-columns">
+                    <div class="col-item"><div class="col-header header-success">✅ สำเร็จ (${cS})</div>${success||"-"}</div>
+                    <div class="col-item"><div class="col-header header-warning">🚚 ระหว่างส่ง (${cW})</div>${warning||"-"}</div>
+                    <div class="col-item"><div class="col-header header-pending">❌ ไม่สำเร็จ (${cP})</div>${pending||"-"}</div>
+                </div>`;
         }
         function exportToExcel() {
-            if (currentExportData.length === 0) { alert("ไม่มีข้อมูลที่จะดาวน์โหลด"); return; }
-            let csvContent = ""; if (currentExportHeaders && currentExportHeaders.length > 0) { csvContent += currentExportHeaders.map(h => `"${h}"`).join(",") + "\n"; }
-            currentExportData.forEach(row => { let rowStr = row.map(item => { let cellData = item === null ? "" : item.toString(); cellData = cellData.replace(/"/g, '""'); return `"${cellData}"`; }).join(","); csvContent += rowStr + "\n"; });
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", `PO_Export_${new Date().toISOString().slice(0,10)}.csv`);
+            if(currentExportData.length===0) return;
+            let csv = ""; if(currentExportHeaders.length) csv += currentExportHeaders.map(h=>`"${h}"`).join(",")+ "\n";
+            currentExportData.forEach(r => csv += r.map(c=>`"${(c||"").toString().replace(/"/g,'""')}"`).join(",")+"\n");
+            const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `PO_Export.csv`;
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
         function logout() { location.reload(); }
