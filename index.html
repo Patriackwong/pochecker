@@ -12,11 +12,11 @@
     <style>
         /* --- Theme Variables --- */
         :root {
-            /* สีเขียว (สำเร็จ) */
+            /* สีเขียว (สำเร็จ/เสร็จ) */
             --primary-green: #2e7d32;
             --bg-green-light: #f1f8e9;
             
-            /* สีแดง (ติดปัญหา/ไม่สำเร็จ) */
+            /* สีแดง (ไม่สำเร็จ/ส่งไม่ได้/ไม่ยืนยัน) */
             --error-red: #c62828;
             --bg-red-light: #ffebee;
             
@@ -109,6 +109,7 @@
         .header-warning { background-color: var(--bg-yellow-light); color: var(--warning-yellow); border: 1px solid #fff59d; }
         .header-pending { background-color: var(--bg-red-light); color: var(--error-red); border: 1px solid #ffcdd2; }
 
+        /* Cards */
         .result-card { border: 1px solid #ddd; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background-color: white; }
         .result-card.status-success { border-left: 5px solid var(--primary-green); }
         .result-card.status-warning { border-left: 5px solid var(--warning-yellow); }
@@ -123,6 +124,7 @@
         .row-item .label { font-weight: 600; color: var(--text-dark); opacity: 0.8; flex-basis: 40%; }
         .row-item .value { color: var(--text-dark); flex-basis: 60%; text-align: right; word-break: break-word; }
 
+        /* Badge */
         .status-badge { display: inline-block; padding: 4px 10px; border-radius: 15px; font-weight: 700; font-size: 0.9em; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .status-badge.success { background-color: var(--primary-green); }
         .status-badge.warning { background-color: var(--warning-yellow); color: #fff; }
@@ -178,8 +180,8 @@
 
     <script>
         // ====================================================
-        // ⚠️⚠️⚠️ ใส่ URL Apps Script ของคุณที่นี่ ⚠️⚠️⚠️
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNDaaWchvWFSvK-ofTspFjKOxLUkeRjiYS3kUaXOLMSyn6wRNtauYbP4svZJqSz7BhaQ/exec'; 
+        // ⚠️⚠️⚠️ วาง URL ใหม่จากการ Deploy ล่าสุด ที่นี่ ⚠️⚠️⚠️
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrS6fBHvCSxp5eOvr_GpNk2_5TuT5nW6oyMQvp28lzkGXocX3nKDE0YomnFhhk_P4enQ/exec'; 
         // ====================================================
 
         let attempts = parseInt(localStorage.getItem('login_attempts')) || 0;
@@ -190,7 +192,7 @@
 
         checkLockout();
 
-        // --- Functions: File Upload (รองรับ XLSX) ---
+        // --- Functions: File Upload (Fixed for CORS) ---
         function processFile(type) {
             const fileInput = document.getElementById(type === 'CHV' ? 'file-chv' : 'file-mrc');
             const file = fileInput.files[0];
@@ -198,7 +200,6 @@
 
             if (!file) return;
 
-            // ตรวจสอบนามสกุล
             const validExts = ['.csv', '.xlsx', '.xls'];
             const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
             
@@ -218,29 +219,20 @@
 
             const reader = new FileReader();
 
-            // Logic แยกประเภทไฟล์
             if (fileExt === '.csv') {
-                // ถ้าเป็น CSV อ่านเป็น Text ปกติ
                 reader.readAsText(file);
                 reader.onload = function(e) {
                     uploadData(type, e.target.result, statusText, fileInput);
                 };
             } else {
-                // ถ้าเป็น Excel (.xlsx) ต้องใช้ SheetJS แปลงเป็น CSV
                 reader.readAsArrayBuffer(file);
                 reader.onload = function(e) {
                     try {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, {type: 'array'});
-                        
-                        // อ่าน Sheet แรก
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
-                        
-                        // แปลง Sheet เป็น CSV
                         const csvContent = XLSX.utils.sheet_to_csv(worksheet);
-                        
-                        // ส่งข้อมูล
                         uploadData(type, csvContent, statusText, fileInput);
                     } catch (error) {
                         console.error(error);
@@ -256,8 +248,13 @@
             statusText.innerText = `กำลังส่งข้อมูล ${type} ขึ้นระบบ...`;
             
             try {
+                // *** FIX: ใช้ header text/plain เพื่อหลีกเลี่ยง CORS Preflight ***
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    redirect: 'follow',
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
                     body: JSON.stringify({
                         type: type,
                         csvData: csvContent
@@ -277,12 +274,15 @@
                 console.error(error);
                 statusText.innerText = `❌ เกิดข้อผิดพลาด: ${error.message || "เชื่อมต่อไม่ได้"}`;
                 statusText.style.color = "red";
+                if (error.message.includes("Failed to fetch")) {
+                    alert("เชื่อมต่อ Server ไม่ได้\nกรุณาตรวจสอบว่ากด 'New Deployment' แล้วหรือยัง");
+                }
             } finally {
                 fileInput.value = ''; 
             }
         }
 
-        // --- Functions: Login & Search (เดิม) ---
+        // --- Functions: Login & Search ---
         function checkLockout() {
             const now = new Date().getTime();
             if (now < lockUntil) { disableLogin(lockUntil - now); } else { enableLogin(); }
@@ -360,6 +360,7 @@
                     result.data.forEach((rowData, resultIndex) => {
                         let rowString = rowData.join(" ");
                         let statusType = "success"; 
+                        // Logic ตรวจสอบสถานะ
                         if (rowString.includes("ไม่สำเร็จ") || rowString.includes("ยังไม่") || rowString.includes("ไม่ยืนยัน") || rowString.includes("ส่งไม่ได้")) { statusType = "pending"; } 
                         else if (rowString.includes("ขนย้าย") || rowString.includes("ระหว่างส่ง")) { statusType = "warning"; }
                         else if (rowString.includes("จัดส่งสำเร็จ") || rowString.includes("จัดส่งเสร็จ")) { statusType = "success"; }
@@ -373,9 +374,11 @@
                             let displayValue = item;
                             let itemStr = item.toString();
                             let badgeType = null;
+                            
                             if (itemStr.includes("ไม่สำเร็จ") || itemStr.includes("ยังไม่") || itemStr.includes("ไม่ยืนยัน") || itemStr.includes("ส่งไม่ได้")) { badgeType = "pending"; } 
                             else if (itemStr.includes("ขนย้าย") || itemStr.includes("ระหว่างส่ง")) { badgeType = "warning"; }
                             else if (itemStr.includes("จัดส่งสำเร็จ") || itemStr.includes("จัดส่งเสร็จ")) { badgeType = "success"; }
+                            
                             if (badgeType) { displayValue = `<span class='status-badge ${badgeType}'>${item}</span>`; }
                             cardHtml += `<div class='row-item'><span class='label'>${headerName}:</span><span class='value'>${displayValue}</span></div>`;
                         });
